@@ -96,9 +96,10 @@ async function loadConversations() {
 
 function renderConversationList(convs) {
   const container = document.getElementById('sidebarChats');
+  const uid = currentUser?.id;
   const channels = convs.filter(c => c.type === 'channel');
   const groups = convs.filter(c => c.type === 'group');
-  const privates = convs.filter(c => c.type === 'private');
+  const privates = convs.filter(c => c.type === 'private' && c.members && uid && c.members[uid]);
 
   let html = '';
 
