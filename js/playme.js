@@ -1,4 +1,4 @@
-const RELEASE_BASE = 'https://github.com/xolerc/me/releases/download/videos-v1/';
+const RELEASE = 'https://github.com/xolerc/me/releases/download/videos-v1';
 
 const DEFAULT_VIDEOS = [
   { file: RELEASE + '/2_5211184992486459614.mp4', title: 'Video 1' },
@@ -13,6 +13,23 @@ const DEFAULT_VIDEOS = [
   { file: RELEASE + '/2_5458751034891467056.mp4', title: 'Video 10' },
   { file: RELEASE + '/2_5462948497839910298.mp4', title: 'Video 11' },
 ];
+
+// Fetch + Blob proxy for correct MIME type
+const blobCache = {};
+
+async function resolveBlobUrl(url) {
+  if (blobCache[url]) return blobCache[url];
+  try {
+    const r = await fetch(url);
+    const blob = await r.blob();
+    const fixed = new Blob([blob], { type: 'video/mp4' });
+    const objUrl = URL.createObjectURL(fixed);
+    blobCache[url] = objUrl;
+    return objUrl;
+  } catch {
+    return url;
+  }
+}
 
 const mainVideo = document.getElementById('playmeVideo');
 const floatVideo = document.getElementById('floatVideo');
@@ -112,11 +129,16 @@ function buildShuffle() {
   shuffleIdx = 0;
 }
 
-function playVideo(index) {
+async function playVideo(index) {
   currentIndex = index;
   const v = videos[index];
   if (!v) return;
-  mainVideo.src = v.file;
+  let src = v.file;
+  if (v.isDefault && !v._blobResolved) {
+    v._blobResolved = true;
+    src = await resolveBlobUrl(v.file);
+  }
+  mainVideo.src = src;
   mainVideo.load();
   mainVideo.play().catch(() => {});
   updateList();
