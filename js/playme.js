@@ -809,3 +809,17 @@ function loadDefaultVideos() {
   } catch {}
   loadDefaultVideos();
 })();
+
+// Global error display
+window.addEventListener('error', e => {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#ff000033;color:#fff;padding:12px;font-size:12px;z-index:9999;font-family:monospace;border-top:1px solid #ff000066';
+  d.textContent = 'JS Error: ' + (e.message || e.error?.message || 'unknown');
+  document.body.appendChild(d);
+});
+window.addEventListener('unhandledrejection', e => {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;bottom:40px;left:0;right:0;background:#ff660033;color:#fff;padding:12px;font-size:12px;z-index:9999;font-family:monospace;border-top:1px solid #ff660066';
+  d.textContent = 'Promise Error: ' + (e.reason?.message || e.reason || 'unknown');
+  document.body.appendChild(d);
+});
