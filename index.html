@@ -25,6 +25,7 @@
     <button class="tab-btn" data-tab="projects">Loyihalar</button>
     <button class="tab-btn" data-tab="chat">Chat</button>
     <button class="tab-btn" data-tab="contact">Aloqa</button>
+    <button class="tab-btn" data-tab="playme">PlayMe</button>
     <button class="tab-btn" data-tab="settings">Sozlamalar</button>
   </nav>
 
@@ -154,12 +155,30 @@
     </section>
   </div>
 
+  <!-- PLAYME TAB -->
+  <div class="tab-content" id="tab-playme">
+    <section class="page-section playme-page">
+      <div class="container">
+        <div class="page-header">
+          <h2>PlayMe</h2>
+          <p class="page-sub">Video pleer</p>
+        </div>
+        <div class="playme-main">
+          <div class="playme-player-wrap">
+            <video id="playmeVideo" class="playme-video" controls playsinline></video>
+          </div>
+          <div class="playme-list" id="playmeList"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <!-- SETTINGS TAB -->
   <div class="tab-content" id="tab-settings">
     <section class="page-section">
       <div class="container">
         <div class="page-header" style="margin-bottom:32px;">
-          <span class="section-number">03</span>
+          <span class="section-number">04</span>
           <h2>Sozlamalar</h2>
           <p class="page-sub">Ilova sozlamalari va yuklamalar</p>
         </div>
@@ -185,6 +204,15 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- Floating Mini Player -->
+  <div class="float-player" id="floatPlayer">
+    <div class="float-player-header">
+      <span class="float-player-title" id="floatTitle">PlayMe</span>
+      <button class="float-player-close" id="floatClose">✕</button>
+    </div>
+    <video id="floatVideo" class="float-video" loop playsinline></video>
   </div>
 
   <!-- Setup Modal -->
@@ -213,6 +241,7 @@
   <script src="js/db.js?v=7"></script>
   <script src="js/chat.js?v=7"></script>
   <script src="js/repos.js?v=7"></script>
+  <script src="js/playme.js?v=7"></script>
   <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </div>
 </body>
