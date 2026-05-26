@@ -1260,8 +1260,8 @@ nav {
   border-radius: 20px;
   overflow: hidden;
   background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  border: 1px solid rgba(99,102,241,0.15);
+  box-shadow: 0 0 30px rgba(99,102,241,0.08), 0 8px 32px rgba(0,0,0,0.3);
 }
 
 .playme-video {
@@ -1272,6 +1272,74 @@ nav {
   border-radius: 20px;
 }
 
+/* Drop Zone */
+.playme-dropzone {
+  border: 2px dashed rgba(99,102,241,0.2);
+  border-radius: 20px;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(99,102,241,0.02);
+}
+
+.playme-dropzone:hover,
+.playme-dropzone.dragover {
+  border-color: rgba(99,102,241,0.5);
+  background: rgba(99,102,241,0.06);
+  box-shadow: 0 0 40px rgba(99,102,241,0.06);
+}
+
+.playme-drop-icon {
+  font-size: 48px;
+  filter: drop-shadow(0 0 20px rgba(99,102,241,0.3));
+}
+
+.playme-drop-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+}
+
+.playme-drop-sub {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.25);
+}
+
+/* Empty State */
+.playme-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  gap: 12px;
+}
+
+.playme-empty-icon {
+  font-size: 64px;
+  opacity: 0.3;
+}
+
+.playme-empty-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.4);
+}
+
+.playme-empty-sub {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+}
+
+/* Playlist */
 .playme-list {
   display: flex;
   gap: 10px;
@@ -1293,6 +1361,7 @@ nav {
   border: 1px solid rgba(255,255,255,0.06);
   cursor: pointer;
   transition: all 0.3s;
+  position: relative;
 }
 
 .playme-item:hover {
@@ -1352,6 +1421,34 @@ nav {
   font-weight: 300;
 }
 
+.playme-item-del {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.5);
+  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+  opacity: 0;
+}
+
+.playme-item:hover .playme-item-del {
+  opacity: 1;
+}
+
+.playme-item-del:hover {
+  background: rgba(255,50,50,0.3);
+  color: #ff4646;
+}
+
 /* ===== FLOATING PLAYER ===== */
 .float-player {
   position: fixed;
@@ -1361,11 +1458,11 @@ nav {
   z-index: 300;
   border-radius: 16px;
   overflow: hidden;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.7);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  border: 1px solid rgba(99,102,241,0.2);
+  box-shadow: 0 0 30px rgba(99,102,241,0.08), 0 16px 48px rgba(0,0,0,0.5);
   display: none;
   cursor: grab;
   transition: opacity 0.3s, transform 0.3s;
@@ -1390,7 +1487,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.4);
 }
 
 .float-player-title {

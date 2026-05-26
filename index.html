@@ -174,6 +174,20 @@
           <div class="playme-player-wrap">
             <video id="playmeVideo" class="playme-video" controls playsinline></video>
           </div>
+          <!-- Drop Zone -->
+          <div class="playme-dropzone" id="playmeDropZone">
+            <input type="file" id="playmeFileInput" accept="video/*" multiple hidden />
+            <div class="playme-drop-icon">🎬</div>
+            <div class="playme-drop-text">Video fayllarni tashlang yoki tanlang</div>
+            <div class="playme-drop-sub">MP4, WebM, MOV va boshqa formatlar</div>
+          </div>
+          <!-- Empty State -->
+          <div class="playme-empty" id="playmeEmpty">
+            <div class="playme-empty-icon">🎥</div>
+            <div class="playme-empty-text">Hali videolar yo'q</div>
+            <div class="playme-empty-sub">Yuqoridagi maydonga video fayllarni tashlang yoki tanlang</div>
+          </div>
+          <!-- Playlist -->
           <div class="playme-list" id="playmeList"></div>
         </div>
       </div>
