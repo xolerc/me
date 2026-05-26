@@ -1,4 +1,5 @@
-// Videos served from GitHub Pages (same origin, correct MIME type)
+// ===== PlayMe v2 — Video Player =====
+
 const VIDEOS_PATH = location.hostname === 'xolerc.github.io' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
   ? 'videos'
   : 'https://raw.githubusercontent.com/xolerc/me/main/videos';
@@ -18,40 +19,68 @@ const DEFAULT_VIDEOS = [
   { file: VIDEOS_PATH + '/2_5462948497839910298.mp4', title: 'Video 12' },
 ];
 
-// Fetch + Blob proxy for correct MIME type
-const blobCache = {};
+// ===== State =====
+const STATE = {
+  IDLE: 'idle',
+  LOADING: 'loading',
+  PLAYING: 'playing',
+  PAUSED: 'paused',
+  ERROR: 'error',
+};
 
-async function resolveBlobUrl(url) {
-  if (blobCache[url]) return blobCache[url];
-  try {
-    const r = await fetch(url);
-    const blob = await r.blob();
-    const fixed = new Blob([blob], { type: 'video/mp4' });
-    const objUrl = URL.createObjectURL(fixed);
-    blobCache[url] = objUrl;
-    return objUrl;
-  } catch {
-    return url;
-  }
-}
+// ===== DOM =====
+const $ = id => document.getElementById(id);
+const el = {
+  video: $('playmeVideo'),
+  float: $('floatVideo'),
+  floatWrap: $('floatPlayer'),
+  floatTitle: $('floatTitle'),
+  floatClose: $('floatClose'),
+  list: $('playmeList'),
+  dropZone: $('playmeDropZone'),
+  fileInput: $('playmeFileInput'),
+  empty: $('playmeEmpty'),
+  playBtn: $('playmePlayBtn'),
+  prevBtn: $('playmePrevBtn'),
+  nextBtn: $('playmeNextBtn'),
+  shuffleBtn: $('playmeShuffleBtn'),
+  repeatBtn: $('playmeRepeatBtn'),
+  speedBtn: $('playmeSpeedBtn'),
+  pipBtn: $('playmePipBtn'),
+  fullBtn: $('playmeFullBtn'),
+  currentTime: $('playmeCurrent'),
+  duration: $('playmeDuration'),
+  progress: $('playmeProgress'),
+  progressFill: $('playmeProgressFill'),
+  volume: $('playmeVolume'),
+  volumeIcon: $('playmeVolumeIcon'),
+  loading: $('playmeLoading'),
+  error: $('playmeError'),
+  controls: $('playmeControls'),
+  header: $('playmeVideoInfo'),
+  title: $('playmeVideoTitle'),
+  count: $('playmeCount'),
+  search: $('playmeSearch'),
+  searchWrap: $('playmeSearchWrap'),
+  retryBtn: $('playmeRetryBtn'),
+};
 
-const mainVideo = document.getElementById('playmeVideo');
-const floatVideo = document.getElementById('floatVideo');
-const floatPlayer = document.getElementById('floatPlayer');
-const floatTitle = document.getElementById('floatTitle');
-const floatClose = document.getElementById('floatClose');
-const playmeList = document.getElementById('playmeList');
-const dropZone = document.getElementById('playmeDropZone');
-const fileInput = document.getElementById('playmeFileInput');
-const emptyState = document.getElementById('playmeEmpty');
-
+// ===== App State =====
+let state = STATE.IDLE;
 let videos = [];
 let currentIndex = 0;
 let shuffleOrder = [];
 let shuffleIdx = 0;
+let isShuffle = false;
+let repeatMode = 0; // 0=off, 1=all, 2=one
+let playbackSpeed = 1;
+let isDragging = false;
+let dragOffX = 0, dragOffY = 0;
 let floatVisible = false;
-let objectUrls = [];
+let pipActive = false;
+let progressDragging = false;
 
+// ===== IndexedDB =====
 const DB_NAME = 'PlayMeDB';
 const STORE_NAME = 'videos';
 
@@ -102,20 +131,12 @@ async function dbClear() {
   await new Promise(r => { tx.oncomplete = r; });
 }
 
-function revokeAllUrls() {
-  objectUrls.forEach(u => URL.revokeObjectURL(u));
-  objectUrls = [];
-}
-
-function addFilesToPlaylist(files) {
-  for (const file of files) {
-    const url = URL.createObjectURL(file);
-    objectUrls.push(url);
-    videos.push({ file: url, blob: file, name: file.name, title: file.name.replace(/\.\w+$/, ''), fromUser: true });
-    dbSave(file);
-  }
-  renderPlaylist();
-  if (videos.length > 0 && mainVideo.paused) playVideo(0);
+// ===== Helpers =====
+function formatTime(s) {
+  if (!s || !isFinite(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
 }
 
 function shuffleArray(a) {
@@ -128,201 +149,678 @@ function shuffleArray(a) {
 }
 
 function buildShuffle() {
-  const idxs = videos.map((_, i) => i);
-  shuffleOrder = shuffleArray(idxs);
+  shuffleOrder = shuffleArray(videos.map((_, i) => i));
   shuffleIdx = 0;
 }
 
-async function playVideo(index) {
-  currentIndex = index;
-  const v = videos[index];
-  if (!v) return;
-  let src = v.file;
-  if (v.isDefault && !v._blobResolved) {
-    v._blobResolved = true;
-    src = await resolveBlobUrl(v.file);
-  }
-  mainVideo.src = src;
-  mainVideo.load();
-  mainVideo.play().catch(() => {});
-  updateList();
+let objectUrls = [];
+function revokeAll() {
+  objectUrls.forEach(u => URL.revokeObjectURL(u));
+  objectUrls = [];
 }
 
-function nextShuffle() {
-  if (shuffleIdx >= shuffleOrder.length) buildShuffle();
-  const idx = shuffleOrder[shuffleIdx++];
-  playVideo(idx);
+// ===== Load/Save Position =====
+function savePosition(index, time) {
+  try {
+    const data = JSON.parse(localStorage.getItem('playme_positions') || '{}');
+    data[index] = { time, updated: Date.now() };
+    localStorage.setItem('playme_positions', JSON.stringify(data));
+  } catch {}
 }
 
+function getSavedPosition(index) {
+  try {
+    const data = JSON.parse(localStorage.getItem('playme_positions') || '{}');
+    return data[index] ? data[index].time : 0;
+  } catch { return 0; }
+}
+
+function saveSettings() {
+  localStorage.setItem('playme_settings', JSON.stringify({
+    isShuffle,
+    repeatMode,
+    playbackSpeed,
+  }));
+}
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('playme_settings') || '{}');
+    if (s.isShuffle !== undefined) isShuffle = s.isShuffle;
+    if (s.repeatMode !== undefined) repeatMode = s.repeatMode;
+    if (s.playbackSpeed !== undefined) playbackSpeed = s.playbackSpeed;
+    updateRepeatUI();
+    updateShuffleUI();
+    updateSpeedUI();
+    if (el.video) el.video.playbackRate = playbackSpeed;
+    if (el.float) el.float.playbackRate = playbackSpeed;
+  } catch {}
+}
+
+// ===== Render =====
 function renderEmpty() {
-  emptyState.style.display = 'flex';
-  dropZone.style.display = 'flex';
-  playmeList.style.display = 'none';
+  el.empty.style.display = 'flex';
+  el.dropZone.style.display = 'flex';
+  el.list.style.display = 'none';
+  el.controls.style.display = 'none';
+  el.header.style.display = 'none';
+  el.searchWrap.style.display = 'none';
+  el.error.style.display = 'none';
 }
 
 function renderPlaylist() {
   if (videos.length === 0) { renderEmpty(); return; }
-  emptyState.style.display = 'none';
-  dropZone.style.display = 'none';
-  playmeList.style.display = 'flex';
+  el.empty.style.display = 'none';
+  el.dropZone.style.display = 'none';
+  el.list.style.display = 'flex';
+  el.controls.style.display = '';
+  el.header.style.display = '';
+  el.searchWrap.style.display = '';
+  el.error.style.display = 'none';
 
-  playmeList.innerHTML = videos.map((v, i) => `
+  const searchTerm = el.search ? el.search.value.toLowerCase().trim() : '';
+  const filtered = videos.map((v, i) => ({ v, i })).filter(x =>
+    (x.v.title || '').toLowerCase().includes(searchTerm) ||
+    (x.v.name || '').toLowerCase().includes(searchTerm)
+  );
+
+  if (filtered.length === 0 && searchTerm) {
+    el.list.innerHTML = `<div class="playme-search-empty">Hech narsa topilmadi</div>`;
+    return;
+  }
+
+  el.list.innerHTML = filtered.map(({ v, i }) => `
     <div class="playme-item${i === currentIndex ? ' active' : ''}" data-index="${i}">
-      <div class="playme-thumb">
-        <span class="playme-play-icon">▶</span>
+      <div class="playme-item-thumb" data-index="${i}">
+        <span class="playme-item-play">▶</span>
+        ${v._thumbnail ? `<img src="${v._thumbnail}" alt="" />` : ''}
       </div>
-      <div class="playme-item-info">
+      <div class="playme-item-body">
         <span class="playme-item-title">${v.title || 'Video ' + (i + 1)}</span>
-        <span class="playme-item-num">${v.fromUser && v.blob ? (v.blob.size / 1024 / 1024).toFixed(1) + ' MB' : 'yuklab olingan'}</span>
+        <span class="playme-item-meta">${v._duration ? formatTime(v._duration) : ''}${v.fromUser ? ' · ' + (v.blob ? (v.blob.size / 1024 / 1024).toFixed(1) + ' MB' : 'local') : ' · online'}</span>
       </div>
       ${v.fromUser ? `<button class="playme-item-del" data-index="${i}" title="O'chirish">✕</button>` : ''}
+      <div class="playme-item-progress" style="width:${v._progress || 0}%"></div>
     </div>
   `).join('');
 
-  playmeList.querySelectorAll('.playme-item').forEach(el => {
-    el.addEventListener('click', e => {
+  el.list.querySelectorAll('.playme-item').forEach(item => {
+    item.addEventListener('click', e => {
       if (e.target.closest('.playme-item-del')) return;
-      const idx = parseInt(el.dataset.index);
-      playVideo(idx);
+      playVideo(parseInt(item.dataset.index));
     });
   });
 
-  playmeList.querySelectorAll('.playme-item-del').forEach(btn => {
+  el.list.querySelectorAll('.playme-item-del').forEach(btn => {
     btn.addEventListener('click', async e => {
       e.stopPropagation();
-      const idx = parseInt(btn.dataset.index);
-      const v = videos[idx];
-      if (v.blob) {
-        const entries = await dbLoadAll();
-        const match = entries.find(e => e.name === v.blob.name && e.size === v.blob.size);
-        if (match) await dbDelete(match.id);
-      }
-      URL.revokeObjectURL(v.file);
-      videos.splice(idx, 1);
-      objectUrls = objectUrls.filter(u => u !== v.file);
-      if (videos.length === 0) {
-        revokeAllUrls();
-        renderEmpty();
-        mainVideo.pause();
-        mainVideo.src = '';
-        return;
-      }
-      if (idx === currentIndex) { playVideo(0); }
-      else if (idx < currentIndex) { currentIndex--; }
-      renderPlaylist();
+      removeVideo(parseInt(btn.dataset.index));
     });
   });
+
+  el.count.textContent = videos.length + ' video' + (videos.length !== 1 ? '' : '');
 }
 
-function updateList() {
-  playmeList.querySelectorAll('.playme-item').forEach(el => {
-    el.classList.toggle('active', parseInt(el.dataset.index) === currentIndex);
+function removeVideo(idx) {
+  const v = videos[idx];
+  if (v.blob) {
+    dbLoadAll().then(entries => {
+      const match = entries.find(e => e.name === v.blob.name && e.size === v.blob.size);
+      if (match) dbDelete(match.id);
+    });
+  }
+  if (v.file.startsWith('blob:')) URL.revokeObjectURL(v.file);
+  objectUrls = objectUrls.filter(u => u !== v.file);
+  videos.splice(idx, 1);
+  if (videos.length === 0) {
+    revokeAll();
+    renderEmpty();
+    el.video.pause();
+    el.video.removeAttribute('src');
+    setState(STATE.IDLE);
+    return;
+  }
+  if (idx === currentIndex) { playVideo(0); }
+  else if (idx < currentIndex) { currentIndex--; renderPlaylist(); }
+  else renderPlaylist();
+}
+
+function addFilesToPlaylist(files) {
+  for (const file of files) {
+    const url = URL.createObjectURL(file);
+    objectUrls.push(url);
+    videos.push({
+      file: url,
+      blob: file,
+      name: file.name,
+      title: file.name.replace(/\.\w+$/, ''),
+      fromUser: true,
+      _duration: 0,
+      _progress: 0,
+    });
+    dbSave(file);
+  }
+  renderPlaylist();
+  if (videos.length > 0 && el.video.paused) playVideo(videos.length - files.length);
+}
+
+// ===== Playback =====
+function setState(newState) {
+  state = newState;
+  el.video.dataset.state = state;
+  switch (state) {
+    case STATE.LOADING:
+      el.loading.style.display = '';
+      el.error.style.display = 'none';
+      break;
+    case STATE.ERROR:
+      el.loading.style.display = 'none';
+      el.error.style.display = '';
+      break;
+    default:
+      el.loading.style.display = 'none';
+      el.error.style.display = 'none';
+  }
+}
+
+async function playVideo(index) {
+  if (index < 0 || index >= videos.length) return;
+  currentIndex = index;
+  const v = videos[index];
+  if (!v) return;
+
+  setState(STATE.LOADING);
+  el.video.src = v.file;
+  el.video.load();
+
+  el.title.textContent = v.title || 'Video ' + (index + 1);
+  el.header.style.display = '';
+  renderPlaylist();
+  updateNavButtons();
+}
+
+el.video.addEventListener('loadedmetadata', () => {
+  videos[currentIndex]._duration = el.video.duration;
+  const saved = getSavedPosition(currentIndex);
+  if (saved > 0 && saved < el.video.duration - 5) {
+    el.video.currentTime = saved;
+  }
+  el.video.play().catch(() => {});
+  setState(STATE.PLAYING);
+  renderPlaylist();
+});
+
+el.video.addEventListener('waiting', () => setState(STATE.LOADING));
+el.video.addEventListener('canplay', () => {
+  if (!el.video.paused) setState(STATE.PLAYING);
+});
+el.video.addEventListener('play', () => {
+  setState(STATE.PLAYING);
+  showFloatPlayer();
+});
+el.video.addEventListener('pause', () => setState(STATE.PAUSED));
+el.video.addEventListener('error', () => setState(STATE.ERROR));
+
+el.video.addEventListener('timeupdate', () => {
+  const v = el.video;
+  el.currentTime.textContent = formatTime(v.currentTime);
+  el.duration.textContent = formatTime(v.duration);
+  const pct = v.duration ? (v.currentTime / v.duration * 100) : 0;
+  el.progressFill.style.width = pct + '%';
+  videos[currentIndex]._progress = pct;
+  savePosition(currentIndex, v.currentTime);
+  if (floatVisible && !el.float.paused) {
+    const diff = Math.abs(el.float.currentTime - v.currentTime);
+    if (diff > 2) el.float.currentTime = v.currentTime;
+  }
+  updatePlaylistProgress();
+});
+
+el.video.addEventListener('ended', () => {
+  videos[currentIndex]._progress = 0;
+  if (repeatMode === 2) {
+    el.video.currentTime = 0;
+    el.video.play().catch(() => {});
+    return;
+  }
+  if (isShuffle) nextShuffle();
+  else nextVideo();
+});
+
+function updatePlaylistProgress() {
+  const items = el.list.querySelectorAll('.playme-item');
+  items.forEach(item => {
+    const idx = parseInt(item.dataset.index);
+    const prog = item.querySelector('.playme-item-progress');
+    if (prog && videos[idx]) {
+      prog.style.width = (videos[idx]._progress || 0) + '%';
+    }
   });
 }
 
-dropZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => {
+function nextVideo() {
+  if (currentIndex + 1 < videos.length) playVideo(currentIndex + 1);
+  else if (repeatMode === 1) playVideo(0);
+}
+
+function prevVideo() {
+  if (el.video.currentTime > 3) {
+    el.video.currentTime = 0;
+    return;
+  }
+  if (currentIndex - 1 >= 0) playVideo(currentIndex - 1);
+  else if (repeatMode === 1) playVideo(videos.length - 1);
+}
+
+function nextShuffle() {
+  shuffleIdx++;
+  if (shuffleIdx >= shuffleOrder.length) {
+    if (repeatMode === 1) buildShuffle();
+    else { shuffleIdx = 0; return; }
+  }
+  playVideo(shuffleOrder[shuffleIdx]);
+}
+
+function updateNavButtons() {
+  if (!el.prevBtn || !el.nextBtn) return;
+  el.prevBtn.disabled = !isShuffle && currentIndex === 0 && repeatMode !== 1;
+  el.nextBtn.disabled = !isShuffle && currentIndex >= videos.length - 1 && repeatMode !== 1;
+}
+
+// ===== Controls =====
+el.playBtn.addEventListener('click', () => {
+  if (el.video.paused) el.video.play().catch(() => {});
+  else el.video.pause();
+});
+
+el.prevBtn.addEventListener('click', () => {
+  if (isShuffle) {
+    shuffleIdx = Math.max(0, shuffleIdx - 2);
+    nextShuffle();
+  } else prevVideo();
+});
+
+el.nextBtn.addEventListener('click', () => {
+  if (isShuffle) nextShuffle();
+  else nextVideo();
+});
+
+el.shuffleBtn.addEventListener('click', () => {
+  isShuffle = !isShuffle;
+  if (isShuffle) buildShuffle();
+  updateShuffleUI();
+  updateNavButtons();
+  saveSettings();
+});
+
+el.repeatBtn.addEventListener('click', () => {
+  repeatMode = (repeatMode + 1) % 3;
+  updateRepeatUI();
+  saveSettings();
+});
+
+el.speedBtn.addEventListener('click', () => {
+  const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+  const idx = speeds.indexOf(playbackSpeed);
+  playbackSpeed = speeds[(idx + 1) % speeds.length];
+  el.video.playbackRate = playbackSpeed;
+  el.float.playbackRate = playbackSpeed;
+  updateSpeedUI();
+  saveSettings();
+});
+
+el.pipBtn.addEventListener('click', async () => {
+  try {
+    if (document.pictureInPictureElement) {
+      await document.exitPictureInPicture();
+    } else {
+      await el.video.requestPictureInPicture();
+    }
+  } catch {}
+});
+
+el.video.addEventListener('enterpictureinpicture', () => {
+  pipActive = true;
+  el.pipBtn.classList.add('active');
+});
+el.video.addEventListener('leavepictureinpicture', () => {
+  pipActive = false;
+  el.pipBtn.classList.remove('active');
+});
+
+el.fullBtn.addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else el.video.requestFullscreen();
+});
+
+el.progress.addEventListener('mousedown', e => {
+  progressDragging = true;
+  seekProgress(e);
+});
+document.addEventListener('mousemove', e => {
+  if (progressDragging) seekProgress(e);
+});
+document.addEventListener('mouseup', () => { progressDragging = false; });
+el.progress.addEventListener('touchstart', e => {
+  progressDragging = true;
+  seekProgress(e.touches[0]);
+});
+document.addEventListener('touchmove', e => {
+  if (progressDragging) seekProgress(e.touches[0]);
+});
+document.addEventListener('touchend', () => { progressDragging = false; });
+
+function seekProgress(e) {
+  const rect = el.progress.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  el.video.currentTime = pct * el.video.duration;
+}
+
+el.volume.addEventListener('input', () => {
+  const v = parseFloat(el.volume.value);
+  el.video.volume = v;
+  el.float.volume = v;
+  updateVolumeIcon(v);
+});
+
+el.volumeIcon.addEventListener('click', () => {
+  if (el.video.volume > 0) {
+    el.video.dataset.prevVolume = el.video.volume;
+    el.video.volume = 0;
+    el.float.volume = 0;
+    el.volume.value = 0;
+  } else {
+    const prev = parseFloat(el.video.dataset.prevVolume) || 0.5;
+    el.video.volume = prev;
+    el.float.volume = prev;
+    el.volume.value = prev;
+  }
+  updateVolumeIcon(el.video.volume);
+});
+
+function updateVolumeIcon(v) {
+  if (!el.volumeIcon) return;
+  el.volumeIcon.textContent = v === 0 ? '🔇' : v < 0.5 ? '🔉' : '🔊';
+}
+
+// ===== Keyboard Shortcuts =====
+document.addEventListener('keydown', e => {
+  const active = document.activeElement;
+  if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+  const tab = document.getElementById('tab-playme');
+  if (!tab || !tab.classList.contains('active')) return;
+
+  switch (e.key) {
+    case ' ':
+    case 'k':
+      e.preventDefault();
+      el.playBtn.click();
+      break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      el.video.currentTime = Math.max(0, el.video.currentTime - 5);
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      el.video.currentTime = Math.min(el.video.duration, el.video.currentTime + 5);
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      el.video.volume = Math.min(1, el.video.volume + 0.1);
+      el.volume.value = el.video.volume;
+      updateVolumeIcon(el.video.volume);
+      break;
+    case 'ArrowDown':
+      e.preventDefault();
+      el.video.volume = Math.max(0, el.video.volume - 0.1);
+      el.volume.value = el.video.volume;
+      updateVolumeIcon(el.video.volume);
+      break;
+    case 'm':
+      el.volumeIcon.click();
+      break;
+    case 'f':
+      el.fullBtn.click();
+      break;
+    case 'n':
+    case 'l':
+      el.nextBtn.click();
+      break;
+    case 'p':
+    case 'ArrowLeft':
+      e.preventDefault();
+      break;
+  }
+});
+
+// ===== Search =====
+el.search.addEventListener('input', renderPlaylist);
+
+// ===== File Input / Drag Drop =====
+el.dropZone.addEventListener('click', () => el.fileInput.click());
+el.fileInput.addEventListener('change', e => {
   if (e.target.files.length > 0) addFilesToPlaylist(e.target.files);
   e.target.value = '';
 });
 
-dropZone.addEventListener('dragover', e => {
+el.dropZone.addEventListener('dragover', e => {
   e.preventDefault();
-  dropZone.classList.add('dragover');
+  el.dropZone.classList.add('dragover');
 });
-
-dropZone.addEventListener('dragleave', () => {
-  dropZone.classList.remove('dragover');
+el.dropZone.addEventListener('dragleave', () => {
+  el.dropZone.classList.remove('dragover');
 });
-
-dropZone.addEventListener('drop', e => {
+el.dropZone.addEventListener('drop', e => {
   e.preventDefault();
-  dropZone.classList.remove('dragover');
+  el.dropZone.classList.remove('dragover');
   if (e.dataTransfer.files.length > 0) addFilesToPlaylist(e.dataTransfer.files);
 });
 
+// ===== Floating Mini Player =====
 function showFloatPlayer() {
   if (!videos[currentIndex]) return;
-  floatVideo.src = mainVideo.src;
-  floatVideo.currentTime = mainVideo.currentTime;
-  floatVideo.play().catch(() => {});
-  floatPlayer.classList.add('show');
+  el.float.src = el.video.src;
+  el.float.currentTime = el.video.currentTime;
+  el.float.play().catch(() => {});
+  el.floatWrap.classList.add('show');
   floatVisible = true;
-  const v = videos[currentIndex];
-  floatTitle.textContent = v ? v.title : 'PlayMe';
+  el.floatTitle.textContent = videos[currentIndex].title || 'PlayMe';
 }
 
 function hideFloatPlayer() {
-  floatVideo.pause();
-  floatVideo.src = '';
-  floatPlayer.classList.remove('show');
+  el.float.pause();
+  el.float.removeAttribute('src');
+  el.floatWrap.classList.remove('show');
   floatVisible = false;
 }
 
-mainVideo.addEventListener('play', () => { showFloatPlayer(); });
+el.floatClose.addEventListener('click', hideFloatPlayer);
 
-mainVideo.addEventListener('timeupdate', () => {
-  if (floatVisible && !floatVideo.paused) {
-    const diff = Math.abs(floatVideo.currentTime - mainVideo.currentTime);
-    if (diff > 2) floatVideo.currentTime = mainVideo.currentTime;
-  }
-});
-
-mainVideo.addEventListener('ended', () => { nextShuffle(); });
-
-floatClose.addEventListener('click', hideFloatPlayer);
-
-let drag = false;
-let dragOffX = 0, dragOffY = 0;
-
-floatPlayer.addEventListener('mousedown', e => {
-  if (e.target === floatClose) return;
-  drag = true;
-  dragOffX = e.clientX - floatPlayer.offsetLeft;
-  dragOffY = e.clientY - floatPlayer.offsetTop;
-  floatPlayer.style.transition = 'none';
+el.floatWrap.addEventListener('mousedown', e => {
+  if (e.target.closest('.float-player-close')) return;
+  if (e.target.closest('.float-player-resize')) return;
+  if (e.target.closest('video')) return;
+  isDragging = true;
+  dragOffX = e.clientX - el.floatWrap.offsetLeft;
+  dragOffY = e.clientY - el.floatWrap.offsetTop;
+  el.floatWrap.style.transition = 'none';
 });
 
 document.addEventListener('mousemove', e => {
-  if (!drag) return;
+  if (!isDragging) return;
   let x = e.clientX - dragOffX;
   let y = e.clientY - dragOffY;
-  x = Math.max(0, Math.min(window.innerWidth - floatPlayer.offsetWidth, x));
-  y = Math.max(0, Math.min(window.innerHeight - floatPlayer.offsetHeight, y));
-  floatPlayer.style.left = x + 'px';
-  floatPlayer.style.top = y + 'px';
-  floatPlayer.style.right = 'auto';
-  floatPlayer.style.bottom = 'auto';
+  x = Math.max(0, Math.min(window.innerWidth - el.floatWrap.offsetWidth, x));
+  y = Math.max(0, Math.min(window.innerHeight - el.floatWrap.offsetHeight, y));
+  el.floatWrap.style.left = x + 'px';
+  el.floatWrap.style.top = y + 'px';
+  el.floatWrap.style.right = 'auto';
+  el.floatWrap.style.bottom = 'auto';
 });
 
-document.addEventListener('mouseup', () => { drag = false; floatPlayer.style.transition = ''; });
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+  el.floatWrap.style.transition = '';
+});
 
+// Touch drag
+let touchDragId = null;
+el.floatWrap.addEventListener('touchstart', e => {
+  if (e.target.closest('.float-player-close')) return;
+  if (e.target.closest('video')) return;
+  const t = e.changedTouches[0];
+  touchDragId = t.identifier;
+  dragOffX = t.clientX - el.floatWrap.offsetLeft;
+  dragOffY = t.clientY - el.floatWrap.offsetTop;
+  el.floatWrap.style.transition = 'none';
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  const t = Array.from(e.changedTouches).find(tc => tc.identifier === touchDragId);
+  if (!t) return;
+  e.preventDefault();
+  let x = t.clientX - dragOffX;
+  let y = t.clientY - dragOffY;
+  x = Math.max(0, Math.min(window.innerWidth - el.floatWrap.offsetWidth, x));
+  y = Math.max(0, Math.min(window.innerHeight - el.floatWrap.offsetHeight, y));
+  el.floatWrap.style.left = x + 'px';
+  el.floatWrap.style.top = y + 'px';
+  el.floatWrap.style.right = 'auto';
+  el.floatWrap.style.bottom = 'auto';
+}, { passive: false });
+
+document.addEventListener('touchend', e => {
+  const t = Array.from(e.changedTouches).find(tc => tc.identifier === touchDragId);
+  if (!t) return;
+  touchDragId = null;
+  el.floatWrap.style.transition = '';
+});
+
+// Resize
+const resizeHandle = document.createElement('div');
+resizeHandle.className = 'float-player-resize';
+el.floatWrap.appendChild(resizeHandle);
+
+let resizeActive = false;
+let resizeStart = {};
+
+resizeHandle.addEventListener('mousedown', e => {
+  e.stopPropagation();
+  resizeActive = true;
+  resizeStart = {
+    x: e.clientX, y: e.clientY,
+    w: el.floatWrap.offsetWidth, h: el.floatWrap.offsetHeight,
+  };
+});
+
+document.addEventListener('mousemove', e => {
+  if (!resizeActive) return;
+  const dw = e.clientX - resizeStart.x;
+  const dh = e.clientY - resizeStart.y;
+  const w = Math.max(160, resizeStart.w + dw);
+  const h = Math.max(90, resizeStart.h + dh);
+  el.floatWrap.style.width = w + 'px';
+  el.floatWrap.style.height = 'auto';
+});
+
+document.addEventListener('mouseup', () => { resizeActive = false; });
+
+// ===== Video Thumbnails =====
+function generateThumbnail(video, at = 1) {
+  return new Promise(resolve => {
+    try {
+      const v = document.createElement('video');
+      v.src = video.file;
+      v.crossOrigin = 'anonymous';
+      v.currentTime = at;
+      v.muted = true;
+      v.onloadeddata = () => {
+        setTimeout(() => {
+          const c = document.createElement('canvas');
+          c.width = 160;
+          c.height = 90;
+          c.getContext('2d').drawImage(v, 0, 0, 160, 90);
+          video._thumbnail = c.toDataURL('image/jpeg', 0.7);
+          v.remove();
+          resolve();
+        }, 200);
+      };
+      v.onerror = () => { v.remove(); resolve(); };
+      v.load();
+    } catch { resolve(); }
+  });
+}
+
+// ===== UI Updates =====
+function updateShuffleUI() {
+  el.shuffleBtn.classList.toggle('active', isShuffle);
+}
+function updateRepeatUI() {
+  el.repeatBtn.classList.remove('mode-one');
+  el.repeatBtn.textContent = repeatMode === 0 ? '🔁' : repeatMode === 1 ? '🔁' : '🔂';
+  if (repeatMode === 2) el.repeatBtn.classList.add('mode-one');
+}
+function updateSpeedUI() {
+  el.speedBtn.textContent = playbackSpeed + '×';
+}
+function updatePlayBtn() {
+  if (!el.playBtn) return;
+  el.playBtn.textContent = el.video.paused ? '▶' : '⏸';
+}
+
+// Play button state sync
+el.video.addEventListener('play', updatePlayBtn);
+el.video.addEventListener('pause', updatePlayBtn);
+
+// ===== Retry Button =====
+el.retryBtn.addEventListener('click', () => {
+  if (videos[currentIndex]) playVideo(currentIndex);
+});
+
+// ===== Load Default Videos =====
+async function loadDefaultVideos() {
+  videos = DEFAULT_VIDEOS.map((v, i) => ({
+    file: v.file,
+    name: 'video_' + (i + 1) + '.mp4',
+    title: v.title,
+    fromUser: false,
+    _duration: 0,
+    _progress: 0,
+  }));
+  buildShuffle();
+  renderPlaylist();
+
+  // Generate thumbnails lazily
+  for (const v of videos) {
+    generateThumbnail(v, 2).then(() => renderPlaylist());
+  }
+
+  playVideo(0);
+}
+
+// ===== Init =====
 (async function initPlayMe() {
+  loadSettings();
   const entries = await dbLoadAll();
   if (entries.length > 0) {
-    revokeAllUrls();
+    revokeAll();
     videos = [];
     for (const e of entries) {
       const url = URL.createObjectURL(e.blob);
       objectUrls.push(url);
-      videos.push({ file: url, blob: e.blob, name: e.name, title: e.name.replace(/\.\w+$/, ''), fromUser: true });
+      videos.push({
+        file: url,
+        blob: e.blob,
+        name: e.name,
+        title: e.name.replace(/\.\w+$/, ''),
+        fromUser: true,
+        _duration: 0,
+        _progress: 0,
+      });
     }
     renderPlaylist();
     if (videos.length > 0) playVideo(0);
     return;
   }
-
   loadDefaultVideos();
 })();
-
-function loadDefaultVideos() {
-  videos = DEFAULT_VIDEOS.map(v => ({
-    file: RELEASE_BASE + v.name,
-    name: v.name,
-    title: v.title,
-    fromUser: false,
-  }));
-  buildShuffle();
-  renderPlaylist();
-  playVideo(0);
-}

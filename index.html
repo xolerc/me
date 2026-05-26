@@ -172,7 +172,56 @@
         </div>
         <div class="playme-main">
           <div class="playme-player-wrap">
-            <video id="playmeVideo" class="playme-video" controls playsinline></video>
+            <video id="playmeVideo" class="playme-video" playsinline></video>
+            <!-- Loading -->
+            <div class="playme-loading" id="playmeLoading" style="display:none">
+              <div class="playme-loading-spinner"></div>
+            </div>
+            <!-- Error -->
+            <div class="playme-error" id="playmeError" style="display:none">
+              <span>⚠ Yuklanmadi</span>
+              <button class="playme-error-retry" id="playmeRetryBtn">Qayta urinish</button>
+            </div>
+            <!-- Controls -->
+            <div class="playme-controls" id="playmeControls">
+              <div class="playme-controls-top">
+                <div class="playme-video-info" id="playmeVideoInfo">
+                  <span class="playme-video-title" id="playmeVideoTitle">Video</span>
+                </div>
+              </div>
+              <div class="playme-controls-bottom">
+                <div class="playme-progress" id="playmeProgress">
+                  <div class="playme-progress-fill" id="playmeProgressFill"></div>
+                  <div class="playme-progress-thumb"></div>
+                </div>
+                <div class="playme-controls-row">
+                  <div class="playme-controls-left">
+                    <button class="playme-btn" id="playmePlayBtn" title="Play/Pause">▶</button>
+                    <button class="playme-btn" id="playmePrevBtn" title="Oldingi">⏮</button>
+                    <button class="playme-btn" id="playmeNextBtn" title="Keyingi">⏭</button>
+                    <span class="playme-time" id="playmeCurrent">0:00</span>
+                    <span class="playme-time-sep">/</span>
+                    <span class="playme-time" id="playmeDuration">0:00</span>
+                  </div>
+                  <div class="playme-controls-right">
+                    <button class="playme-btn playme-btn-shuffle" id="playmeShuffleBtn" title="Tasodifiy">🔀</button>
+                    <button class="playme-btn playme-btn-repeat" id="playmeRepeatBtn" title="Takrorlash">🔁</button>
+                    <button class="playme-btn playme-btn-speed" id="playmeSpeedBtn" title="Tezlik">1×</button>
+                    <button class="playme-btn playme-btn-pip" id="playmePipBtn" title="Picture in Picture">📍</button>
+                    <button class="playme-btn playme-btn-full" id="playmeFullBtn" title="To'liq ekran">⛶</button>
+                    <div class="playme-volume-wrap">
+                      <button class="playme-btn" id="playmeVolumeIcon" title="Ovoz">🔊</button>
+                      <input type="range" class="playme-volume" id="playmeVolume" min="0" max="1" step="0.05" value="0.5" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Search -->
+          <div class="playme-search-wrap" id="playmeSearchWrap" style="display:none">
+            <input type="text" class="playme-search" id="playmeSearch" placeholder="Qidirish..." />
+            <span class="playme-count" id="playmeCount">0 video</span>
           </div>
           <!-- Drop Zone -->
           <div class="playme-dropzone" id="playmeDropZone">
