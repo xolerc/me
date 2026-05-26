@@ -338,7 +338,23 @@ async function playVideo(index) {
   updateNavButtons();
 }
 
+// Video load timeout
+let loadTimer = null;
+function startLoadTimer() {
+  clearTimeout(loadTimer);
+  loadTimer = setTimeout(() => {
+    if (state === STATE.LOADING) {
+      setState(STATE.ERROR);
+    }
+  }, 15000);
+}
+function clearLoadTimer() {
+  clearTimeout(loadTimer);
+}
+
+el.video.addEventListener('loadstart', startLoadTimer);
 el.video.addEventListener('loadedmetadata', () => {
+  clearLoadTimer();
   videos[currentIndex]._duration = el.video.duration;
   const saved = getSavedPosition(currentIndex);
   if (saved > 0 && saved < el.video.duration - 5) {

@@ -1327,22 +1327,29 @@ nav {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  opacity: 0;
-  transition: opacity 0.3s;
   z-index: 10;
   cursor: default;
+  pointer-events: none;
 }
-.playme-player-wrap:hover .playme-controls,
-.playme-controls.visible {
+.playme-controls > * {
+  pointer-events: auto;
+}
+.playme-controls-bottom {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.playme-player-wrap:hover .playme-controls-bottom {
   opacity: 1;
 }
-
-.playme-video:not([data-state="playing"]) ~ .playme-controls {
+.playme-video[data-state="playing"] ~ .playme-controls .playme-controls-bottom {
+  opacity: 0;
+}
+.playme-player-wrap:hover .playme-controls .playme-controls-bottom {
   opacity: 1 !important;
 }
 .playme-video[data-state="loading"] ~ .playme-controls,
 .playme-video[data-state="error"] ~ .playme-controls {
-  opacity: 0 !important;
+  display: none;
 }
 
 /* Video Info Top */
