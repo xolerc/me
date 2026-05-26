@@ -1,16 +1,17 @@
 const RELEASE_BASE = 'https://github.com/xolerc/me/releases/download/videos-v1/';
 
 const DEFAULT_VIDEOS = [
-  { name: '2_5211184992486459614.mp4', title: 'Video 1' },
-  { name: '2_5235775282278869717.mp4', title: 'Video 2' },
-  { name: '2_5237973231792597901.mp4', title: 'Video 3' },
-  { name: '2_5282749129141818157.mp4', title: 'Video 4' },
-  { name: '2_5447322629427989855.mp4', title: 'Video 5' },
-  { name: '2_5452074624193953955.mp4', title: 'Video 6' },
-  { name: '2_5458622658318987050.mp4', title: 'Video 7' },
-  { name: '2_5458751034891467046.mp4', title: 'Video 8' },
-  { name: '2_5458751034891467056.mp4', title: 'Video 9' },
-  { name: '2_5462948497839910298.mp4', title: 'Video 10' },
+  { file: RELEASE + '/2_5211184992486459614.mp4', title: 'Video 1' },
+  { file: RELEASE + '/2_5235775282278869717.mp4', title: 'Video 2' },
+  { file: RELEASE + '/2_5237973231792597901.mp4', title: 'Video 3' },
+  { file: RELEASE + '/2_5282749129141818157.mp4', title: 'Video 4' },
+  { file: RELEASE + '/2_5373350012551988338.mp4', title: 'Video 5' },
+  { file: RELEASE + '/2_5447322629427989855.mp4', title: 'Video 6' },
+  { file: RELEASE + '/2_5452074624193953955.mp4', title: 'Video 7' },
+  { file: RELEASE + '/2_5458622658318987050.mp4', title: 'Video 8' },
+  { file: RELEASE + '/2_5458751034891467046.mp4', title: 'Video 9' },
+  { file: RELEASE + '/2_5458751034891467056.mp4', title: 'Video 10' },
+  { file: RELEASE + '/2_5462948497839910298.mp4', title: 'Video 11' },
 ];
 
 const mainVideo = document.getElementById('playmeVideo');
