@@ -8,6 +8,19 @@ const dropZone = document.getElementById('playmeDropZone');
 const fileInput = document.getElementById('playmeFileInput');
 const emptyState = document.getElementById('playmeEmpty');
 
+const RELEASE = 'https://github.com/xolerc/me/releases/download/videos-v1';
+const DEFAULT_VIDEOS = [
+  { file: RELEASE + '/2_5211184992486459614.mp4', title: 'Video 1' },
+  { file: RELEASE + '/2_5235775282278869717.mp4', title: 'Video 2' },
+  { file: RELEASE + '/2_5237973231792597901.mp4', title: 'Video 3' },
+  { file: RELEASE + '/2_5447322629427989855.mp4', title: 'Video 4' },
+  { file: RELEASE + '/2_5452074624193953955.mp4', title: 'Video 5' },
+  { file: RELEASE + '/2_5458622658318987050.mp4', title: 'Video 6' },
+  { file: RELEASE + '/2_5458751034891467046.mp4', title: 'Video 7' },
+  { file: RELEASE + '/2_5458751034891467056.mp4', title: 'Video 8' },
+  { file: RELEASE + '/2_5462948497839910298.mp4', title: 'Video 9' },
+];
+
 let videos = [];
 let currentIndex = 0;
 let shuffleOrder = [];
@@ -15,72 +28,25 @@ let shuffleIdx = 0;
 let floatVisible = false;
 let objectUrls = [];
 
-const DB_NAME = 'PlayMeDB';
-const STORE_NAME = 'videos';
+const HIDDEN_KEY = 'playme_hidden';
 
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const r = indexedDB.open(DB_NAME, 1);
-    r.onupgradeneeded = () => r.result.createObjectStore(STORE_NAME, { keyPath: 'id' });
-    r.onsuccess = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
-  });
+function getHidden() {
+  try { return JSON.parse(localStorage.getItem(HIDDEN_KEY)) || []; } catch { return []; }
 }
 
-async function dbSave(file) {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  tx.objectStore(STORE_NAME).put({
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    name: file.name,
-    blob: file,
-    size: file.size,
-    type: file.type || 'video/mp4',
-    added: Date.now(),
-  });
-  await new Promise(r => { tx.oncomplete = r; });
+function addHidden(url) {
+  const h = getHidden();
+  if (!h.includes(url)) { h.push(url); localStorage.setItem(HIDDEN_KEY, JSON.stringify(h)); }
 }
 
-async function dbLoadAll() {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readonly');
-  const all = await new Promise(r => {
-    const req = tx.objectStore(STORE_NAME).getAll();
-    req.onsuccess = () => r(req.result);
-  });
-  return all || [];
-}
-
-async function dbDelete(id) {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  tx.objectStore(STORE_NAME).delete(id);
-  await new Promise(r => { tx.oncomplete = r; });
-}
-
-async function dbClear() {
-  const db = await openDB();
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  tx.objectStore(STORE_NAME).clear();
-  await new Promise(r => { tx.oncomplete = r; });
-}
-
-function revokeAllUrls() {
-  objectUrls.forEach(u => URL.revokeObjectURL(u));
-  objectUrls = [];
-}
-
-function addFilesToPlaylist(files) {
-  revokeAllUrls();
+function buildVideoList() {
+  const hidden = getHidden();
   videos = [];
-  for (const file of files) {
-    const url = URL.createObjectURL(file);
-    objectUrls.push(url);
-    videos.push({ file: url, blob: file, name: file.name, title: file.name.replace(/\.\w+$/, '') });
-    dbSave(file);
+  objectUrls = [];
+  for (const d of DEFAULT_VIDEOS) {
+    if (hidden.includes(d.file)) continue;
+    videos.push({ file: d.file, title: d.title, isDefault: true });
   }
-  renderPlaylist();
-  if (videos.length > 0) playVideo(0);
 }
 
 function shuffleArray(a) {
@@ -132,8 +98,8 @@ function renderPlaylist() {
         <span class="playme-play-icon">▶</span>
       </div>
       <div class="playme-item-info">
-        <span class="playme-item-title">${v.title || 'Video ' + (i + 1)}</span>
-        <span class="playme-item-num">${(v.blob?.size / 1024 / 1024).toFixed(1)} MB</span>
+        <span class="playme-item-title">${v.title}</span>
+        <span class="playme-item-num">Video ${i + 1}</span>
       </div>
       <button class="playme-item-del" data-index="${i}" title="O'chirish">✕</button>
     </div>
@@ -148,26 +114,19 @@ function renderPlaylist() {
   });
 
   playmeList.querySelectorAll('.playme-item-del').forEach(btn => {
-    btn.addEventListener('click', async e => {
+    btn.addEventListener('click', e => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.index);
       const v = videos[idx];
-      if (v.blob) {
-        const entries = await dbLoadAll();
-        const match = entries.find(e => e.name === v.blob.name && e.size === v.blob.size);
-        if (match) await dbDelete(match.id);
-      }
-      URL.revokeObjectURL(v.file);
+      if (v.isDefault) addHidden(v.file);
       videos.splice(idx, 1);
-      objectUrls = objectUrls.filter(u => u !== v.file);
       if (videos.length === 0) {
-        revokeAllUrls();
         renderEmpty();
         mainVideo.pause();
         mainVideo.src = '';
         return;
       }
-      if (idx === currentIndex) { playVideo(0); }
+      if (idx === currentIndex) { playVideo(Math.min(0, videos.length - 1)); }
       else if (idx < currentIndex) { currentIndex--; }
       renderPlaylist();
     });
@@ -178,6 +137,11 @@ function updateList() {
   playmeList.querySelectorAll('.playme-item').forEach(el => {
     el.classList.toggle('active', parseInt(el.dataset.index) === currentIndex);
   });
+}
+
+// Default video titles
+function getFileTitle(name) {
+  return name.replace(/\.\w+$/, '').replace(/^\d+_/, 'Video ');
 }
 
 // Drop zone
@@ -202,6 +166,16 @@ dropZone.addEventListener('drop', e => {
   if (e.dataTransfer.files.length > 0) addFilesToPlaylist(e.dataTransfer.files);
 });
 
+function addFilesToPlaylist(files) {
+  for (const file of files) {
+    const url = URL.createObjectURL(file);
+    objectUrls.push(url);
+    videos.push({ file: url, title: getFileTitle(file.name), isDefault: false });
+  }
+  renderPlaylist();
+  if (videos.length > 0 && !mainVideo.src) playVideo(videos.length - files.length);
+}
+
 // Float player
 function showFloatPlayer() {
   if (!videos[currentIndex]) return;
@@ -210,8 +184,7 @@ function showFloatPlayer() {
   floatVideo.play().catch(() => {});
   floatPlayer.classList.add('show');
   floatVisible = true;
-  const v = videos[currentIndex];
-  floatTitle.textContent = v ? v.title : 'PlayMe';
+  floatTitle.textContent = videos[currentIndex]?.title || 'PlayMe';
 }
 
 function hideFloatPlayer() {
@@ -260,20 +233,11 @@ document.addEventListener('mousemove', e => {
 
 document.addEventListener('mouseup', () => { drag = false; floatPlayer.style.transition = ''; });
 
-// Init: load from IndexedDB
-(async function initPlayMe() {
-  const entries = await dbLoadAll();
-  if (entries.length > 0) {
-    revokeAllUrls();
-    videos = [];
-    for (const e of entries) {
-      const url = URL.createObjectURL(e.blob);
-      objectUrls.push(url);
-      videos.push({ file: url, blob: e.blob, name: e.name, title: e.name.replace(/\.\w+$/, '') });
-    }
-    renderPlaylist();
-    playVideo(0);
-  } else {
-    renderEmpty();
-  }
-})();
+// Init
+buildVideoList();
+if (videos.length > 0) {
+  renderPlaylist();
+  playVideo(0);
+} else {
+  renderEmpty();
+}
