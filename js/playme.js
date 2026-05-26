@@ -3,14 +3,13 @@ const VIDEOS = [
   { file: 'videos/2_5235775282278869717.mp4', title: 'Video 2' },
   { file: 'videos/2_5237973231792597901.mp4', title: 'Video 3' },
   { file: 'videos/2_5282749129141818157.mp4', title: 'Video 4' },
-  { file: 'videos/2_5287781263149656497.mp4', title: 'Video 5' },
-  { file: 'videos/2_5373350012551988338.mp4', title: 'Video 6' },
-  { file: 'videos/2_5447322629427989855.mp4', title: 'Video 7' },
-  { file: 'videos/2_5452074624193953955.mp4', title: 'Video 8' },
-  { file: 'videos/2_5458622658318987050.mp4', title: 'Video 9' },
-  { file: 'videos/2_5458751034891467046.mp4', title: 'Video 10' },
-  { file: 'videos/2_5458751034891467056.mp4', title: 'Video 11' },
-  { file: 'videos/2_5462948497839910298.mp4', title: 'Video 12' },
+  { file: 'videos/2_5373350012551988338.mp4', title: 'Video 5' },
+  { file: 'videos/2_5447322629427989855.mp4', title: 'Video 6' },
+  { file: 'videos/2_5452074624193953955.mp4', title: 'Video 7' },
+  { file: 'videos/2_5458622658318987050.mp4', title: 'Video 8' },
+  { file: 'videos/2_5458751034891467046.mp4', title: 'Video 9' },
+  { file: 'videos/2_5458751034891467056.mp4', title: 'Video 10' },
+  { file: 'videos/2_5462948497839910298.mp4', title: 'Video 11' },
 ];
 
 const mainVideo = document.getElementById('playmeVideo');
