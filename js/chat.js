@@ -5,6 +5,25 @@ let currentUser = null;
 let unsubscribers = {};
 let currentConvId = null;
 let onlineUsers = {};
+let initResolved = false;
+
+async function dbPing() {
+  try {
+    await fetch(DB_URL + '/.json?shallow=true', { signal: AbortSignal.timeout(8000) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    setTimeout(() => { overlay.style.display = 'none'; }, 400);
+  }
+  document.querySelector('.app').style.opacity = '1';
+}
 
 // ===== USER SETUP =====
 async function ensureUser() {
@@ -21,6 +40,9 @@ async function ensureUser() {
 }
 
 (async function init() {
+  // Wait for Firebase connection
+  await dbPing();
+
   const user = await ensureUser();
   if (user) {
     document.getElementById('setupModal').style.display = 'none';
@@ -34,6 +56,8 @@ async function ensureUser() {
   } else {
     document.getElementById('setupModal').style.display = 'flex';
   }
+  hideLoading();
+  initResolved = true;
 })();
 
 document.getElementById('setupSave').addEventListener('click', async () => {
