@@ -1,3 +1,4 @@
+const REACTIONS = ['👍', '❤️', '😊', '😂', '😮', '😢', '🙏', '🔥', '🎉', '💯'];
 const CACHE_KEY = 'xolerc_user';
 
 let currentUser = null;
