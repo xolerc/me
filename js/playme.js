@@ -233,7 +233,6 @@ function renderPlaylist() {
     <div class="playme-item${i === currentIndex ? ' active' : ''}" data-index="${i}">
       <div class="playme-item-thumb" data-index="${i}">
         <span class="playme-item-play">▶</span>
-        ${v._thumbnail ? `<img src="${v._thumbnail}" alt="" />` : ''}
       </div>
       <div class="playme-item-body">
         <span class="playme-item-title">${v.title || 'Video ' + (i + 1)}</span>
@@ -725,32 +724,6 @@ document.addEventListener('mousemove', e => {
 
 document.addEventListener('mouseup', () => { resizeActive = false; });
 
-// ===== Video Thumbnails =====
-function generateThumbnail(video, at = 1) {
-  return new Promise(resolve => {
-    try {
-      const v = document.createElement('video');
-      v.src = video.file;
-      v.crossOrigin = 'anonymous';
-      v.currentTime = at;
-      v.muted = true;
-      v.onloadeddata = () => {
-        setTimeout(() => {
-          const c = document.createElement('canvas');
-          c.width = 160;
-          c.height = 90;
-          c.getContext('2d').drawImage(v, 0, 0, 160, 90);
-          video._thumbnail = c.toDataURL('image/jpeg', 0.7);
-          v.remove();
-          resolve();
-        }, 200);
-      };
-      v.onerror = () => { v.remove(); resolve(); };
-      v.load();
-    } catch { resolve(); }
-  });
-}
-
 // ===== UI Updates =====
 function updateShuffleUI() {
   el.shuffleBtn.classList.toggle('active', isShuffle);
@@ -778,7 +751,7 @@ el.retryBtn.addEventListener('click', () => {
 });
 
 // ===== Load Default Videos =====
-async function loadDefaultVideos() {
+function loadDefaultVideos() {
   videos = DEFAULT_VIDEOS.map((v, i) => ({
     file: v.file,
     name: 'video_' + (i + 1) + '.mp4',
@@ -789,38 +762,34 @@ async function loadDefaultVideos() {
   }));
   buildShuffle();
   renderPlaylist();
-
-  // Generate thumbnails lazily
-  for (const v of videos) {
-    generateThumbnail(v, 2).then(() => renderPlaylist());
-  }
-
   playVideo(0);
 }
 
 // ===== Init =====
 (async function initPlayMe() {
-  loadSettings();
-  const entries = await dbLoadAll();
-  if (entries.length > 0) {
-    revokeAll();
-    videos = [];
-    for (const e of entries) {
-      const url = URL.createObjectURL(e.blob);
-      objectUrls.push(url);
-      videos.push({
-        file: url,
-        blob: e.blob,
-        name: e.name,
-        title: e.name.replace(/\.\w+$/, ''),
-        fromUser: true,
-        _duration: 0,
-        _progress: 0,
-      });
+  try {
+    loadSettings();
+    const entries = await dbLoadAll();
+    if (entries.length > 0) {
+      revokeAll();
+      videos = [];
+      for (const e of entries) {
+        const url = URL.createObjectURL(e.blob);
+        objectUrls.push(url);
+        videos.push({
+          file: url,
+          blob: e.blob,
+          name: e.name,
+          title: e.name.replace(/\.\w+$/, ''),
+          fromUser: true,
+          _duration: 0,
+          _progress: 0,
+        });
+      }
+      renderPlaylist();
+      if (videos.length > 0) playVideo(0);
+      return;
     }
-    renderPlaylist();
-    if (videos.length > 0) playVideo(0);
-    return;
-  }
+  } catch {}
   loadDefaultVideos();
 })();
