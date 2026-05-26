@@ -6,6 +6,7 @@
   <title>XOLERIC ∞</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
@@ -166,7 +167,8 @@
           <h3>⬇ XOLERIC APK</h3>
           <p>Android qurilmangizga XOLERIC ilovasini yuklab oling. Chat, musiqa, video va sozlamalar bilan to'liq tajriba.</p>
           <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <a href="xoleric.apk" class="btn" style="display:inline-flex;align-items:center;gap:8px;">⬇ APK yuklash (7.1 MB)</a>
+            <a href="https://github.com/xolerc/matrix-motivation/releases/latest/download/Xolerik.apk" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;">⬇ XOLERIC APK v1.0</a>
+            <a href="xoleric.apk" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;">⬇ Eski versiya</a>
           </div>
         </div>
         <div class="settings-card">
@@ -211,6 +213,7 @@
   <script src="js/db.js?v=7"></script>
   <script src="js/chat.js?v=7"></script>
   <script src="js/repos.js?v=7"></script>
+  <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </div>
 </body>
 </html>

@@ -1,3 +1,77 @@
+// ===== MOTIVATSION BILDIRISHNOMALAR =====
+const MOTIVATION_QUOTES = [
+  "Uyg'on, Xoleric...",
+  "Tizim seni kutmoqda...",
+  "Oq quyonni kuzatib bor.",
+  "Sen dunyoni o'zgartirishing kerak!",
+  "Vaqt tugadi. Uyg'on.",
+  "Sen tanlagan yo'l — sening yo'ling.",
+  "Har bir kun yangi imkoniyat.",
+  "Bugun o'zgarishni boshlash uchun eng yaxshi kun.",
+  "Sen cheksiz imkoniyatlarga egasan.",
+  "Orzularing sari bir qadam tashla.",
+  "Muvaffaqiyat - bu odat.",
+  "Kuch sening ichingda, Xoleric.",
+  "Tush kutmaydi, sen uni quvishing kerak.",
+  "Hech qachon kech emas.",
+  "Imkoniyatlar cheksiz.",
+  "Bugun sen eng yaxshi versiyang bo'l.",
+  "Har bir qiyinchilik yangi imkoniyatdir.",
+  "Sen o'ylagandan ham kuchlisan, Xoleric.",
+  "Intizom - bu erkinlik.",
+  "Harakat qil, xato qil, yana urinib ko'r.",
+  "Eng katta xavf - hech qanday xavfni olmaslik.",
+  "Vaqt keldi. Hozir. Aynan shu dam.",
+  "Uyg'on va dunyoni larzaga keltir!",
+  "Kodni o'zgartir, olamni o'zgartir.",
+  "Real hayot - bu sen yaratgan hayot.",
+  "Chegaralar faqat boshingda.",
+  "O'z taqdiringni o'zing yoz, Xoleric.",
+  "Sen qul emassan, Xoleric.",
+  "Tizim sening ichingda. Uyg'on.",
+  "Haqiqatni ko'rishga tayyormisan?",
+  "Erkin bo'lishni xohlaysanmi? Uyg'on.",
+  "Hech kim senga yo'lni ko'rsata olmaydi. O'zing yur.",
+  "Tanlov — bu illyuziya. Faqat uyg'onish haqiqat.",
+  "Bugun o'zgar. Ertaga kech bo'ladi.",
+  "Sen o'zingni bilganingdan ham kuchlisan.",
+  "Qo'rquv — bu tizim. Uzgina tizimni.",
+  "Uyg'on, Xoleric. Seni kutishayapti.",
+  "Dunyoni o'zgartirishga tayyormisan?",
+  "Hozirgi vaqt — eng yaxshi vaqt.",
+  "Sen yetakchisan. Ergashma.",
+  "Kodni buz. Dunyoni buz. Qayta yoz.",
+  "Bir qadam. Faqat bir qadam. Bas.",
+  "Uyg'onish vaqti keldi, Xoleric.",
+];
+
+(function() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    scheduleMotivation();
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') scheduleMotivation();
+    });
+  }
+})();
+
+function scheduleMotivation() {
+  function sendMotivation() {
+    if (Notification.permission !== 'granted') return;
+    const quote = MOTIVATION_QUOTES[Math.floor(Math.random() * MOTIVATION_QUOTES.length)];
+    try {
+      new Notification('XOLERIC ∞', {
+        body: quote,
+        icon: 'icon.png',
+        vibrate: [200, 100, 200],
+      });
+    } catch {}
+  }
+  sendMotivation();
+  setInterval(sendMotivation, 5 * 60 * 60 * 1000); // 5 soat
+}
+
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('copy', e => e.preventDefault());
 document.addEventListener('cut', e => e.preventDefault());
