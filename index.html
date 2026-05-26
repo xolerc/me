@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xoleric ∞</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  color: #fff;
+  background:
+    radial-gradient(circle at bottom, rgba(3,3,197,0.35) 0%, rgba(3,3,197,0.12) 25%, transparent 50%),
+    linear-gradient(180deg, #000000 0%, #010103 20%, #020214 45%, #03036A 75%, #0303C5 100%);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 60%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.08), transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(139,92,246,0.06), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== WAVE CANVAS ===== */
+#wave-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ===== FLOATING ORBS ===== */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.2;
+  animation: float 14s ease-in-out infinite;
+}
+
+.orb:nth-child(1) {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(99,102,241,0.3), transparent);
+  top: 8%; left: 3%;
+  animation-delay: 0s;
+}
+
+.orb:nth-child(2) {
+  width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(3,3,197,0.25), transparent);
+  bottom: 15%; right: 8%;
+  animation-delay: -5s;
+}
+
+.orb:nth-child(3) {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(139,92,246,0.2), transparent);
+  top: 50%; left: 65%;
+  animation-delay: -9s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(35px, -45px) scale(1.08); }
+  66% { transform: translate(-25px, 25px) scale(0.92); }
+}
+
+/* ===== LAYER ===== */
+.app {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== X-BTN ===== */
+.x-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 34px;
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.12),
+    0 10px 30px rgba(0,0,0,0.35),
+    0 0 18px rgba(3,3,197,0.18);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+  overflow: hidden;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.x-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.18), transparent 80%);
+  transform: translateX(-120%);
+  transition: 1s;
+}
+
+.x-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.16),
+    0 16px 40px rgba(0,0,0,0.45),
+    0 0 28px rgba(3,3,197,0.35);
+}
+
+.x-btn:hover::before {
+  transform: translateX(120%);
+}
+
+.x-btn:active {
+  transform: scale(0.96);
+}
+
+/* ===== GLASS BLOCK ===== */
+.glass {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.04),
+    0 8px 32px rgba(0,0,0,0.3);
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.nav-logo {
+  padding: 6px 18px 6px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, rgba(3,3,197,0.2), transparent);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+}
+
+.nav-logo span {
+  color: #818cf8;
+}
+
+.nav-link {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  border-radius: 999px;
+  transition: 0.3s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.nav-link:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.nav-link.active {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 24px 60px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  margin-bottom: 36px;
+}
+
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: pd 2s infinite;
+}
+
+@keyframes pd {
+  50% { opacity: 0.3; }
+}
+
+.hero h1 {
+  font-size: clamp(48px, 10vw, 96px);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 18px;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, #f0f4ff 0%, #a5b4fc 50%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero h1 .inf {
+  background: linear-gradient(135deg, #818cf8, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p {
+  max-width: 520px;
+  font-size: 17px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.8;
+  margin-bottom: 44px;
+  font-weight: 300;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ===== SECTION ===== */
+.section {
+  padding: 100px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.section-header h2 {
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 600;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #e8eef5, #a5b4fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-header p {
+  font-size: 16px;
+  color: rgba(255,255,255,0.45);
+  max-width: 440px;
+  margin: 0 auto;
+  font-weight: 300;
+}
+
+/* ===== CARDS ===== */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  padding: 32px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.04),
+    0 8px 32px rgba(0,0,0,0.25);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.06),
+    0 14px 44px rgba(0,0,0,0.35),
+    0 0 24px rgba(3,3,197,0.12);
+}
+
+.card .icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 18px;
+  background: rgba(3,3,197,0.10);
+  border: 1px solid rgba(3,3,197,0.08);
+}
+
+.card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,0.9);
+}
+
+.card p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.card .tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #818cf8;
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.06);
+  margin-top: 14px;
+}
+
+/* ===== STATS ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.stat {
+  text-align: center;
+  padding: 28px 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.stat .num {
+  font-size: 34px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e8eef5, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat .lbl {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 4px;
+  font-weight: 300;
+}
+
+/* ===== PROJECTS ===== */
+.projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.project {
+  padding: 0;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.project:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 14px 44px rgba(0,0,0,0.35),
+    0 0 24px rgba(3,3,197,0.10);
+}
+
+.project .prev {
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  position: relative;
+}
+
+.project .prev::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.3));
+}
+
+.project .body {
+  padding: 24px 28px 28px;
+}
+
+.project .body h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 6px;
+}
+
+.project .body p {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+  font-weight: 300;
+  margin-bottom: 14px;
+}
+
+.project .tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.project .tags span {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.p1 { background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca); }
+.p2 { background: linear-gradient(135deg, #0f172a, #1e293b, #334155); }
+.p3 { background: linear-gradient(135deg, #0c0a1d, #1a0a2e, #2d0a4e); }
+.p4 { background: linear-gradient(135deg, #020617, #0f172a, #1e293b); }
+
+/* ===== CHAT ===== */
+.chat-wrap {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.chat-box {
+  border-radius: 24px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.chat-head .av {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(3,3,197,0.3), rgba(99,102,241,0.2));
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.chat-head .info {
+  flex: 1;
+}
+
+.chat-head .info .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+
+.chat-head .info .st {
+  font-size: 12px;
+  color: #22c55e;
+  font-weight: 300;
+}
+
+.chat-head .info .st .d {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  margin-right: 4px;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pd 2s infinite;
+}
+
+.chat-msgs {
+  padding: 20px 24px;
+  height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chat-msgs::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-msgs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-msgs::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+}
+
+.msg {
+  max-width: 82%;
+  padding: 12px 18px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 300;
+  animation: mi 0.3s ease;
+}
+
+@keyframes mi {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg.user {
+  align-self: flex-end;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.08);
+  border-bottom-right-radius: 4px;
+  color: rgba(255,255,255,0.9);
+}
+
+.msg.ai {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-bottom-left-radius: 4px;
+  color: rgba(255,255,255,0.6);
+}
+
+.msg.ai .typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.msg.ai .typing span {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  animation: ty 1.4s infinite;
+}
+
+.msg.ai .typing span:nth-child(2) { animation-delay: 0.2s; }
+.msg.ai .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes ty {
+  0%, 60%, 100% { opacity: 0.2; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-5px); }
+}
+
+.chat-inp {
+  display: flex;
+  gap: 8px;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.chat-inp input {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: 0.3s;
+  font-weight: 300;
+}
+
+.chat-inp input::placeholder {
+  color: rgba(255,255,255,0.25);
+}
+
+.chat-inp input:focus {
+  border-color: rgba(99,102,241,0.2);
+  background: rgba(255,255,255,0.06);
+}
+
+.chat-inp .x-btn {
+  padding: 12px 24px;
+  flex-shrink: 0;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  text-align: center;
+  padding: 48px 24px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  margin-top: auto;
+}
+
+footer p {
+  font-size: 13px;
+  color: rgba(255,255,255,0.25);
+  font-weight: 300;
+}
+
+footer .links {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+footer .links a {
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+footer .links a:hover {
+  color: rgba(255,255,255,0.7);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  nav {
+    top: 12px;
+    padding: 4px 6px;
+  }
+  .nav-logo { font-size: 12px; padding: 4px 12px 4px 8px; }
+  .nav-link { font-size: 11px; padding: 6px 12px; }
+  .hero { padding: 100px 16px 40px; }
+  .hero h1 { font-size: clamp(36px, 12vw, 52px); letter-spacing: -1px; }
+  .section { padding: 60px 16px; }
+  .projects { grid-template-columns: 1fr; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .card { padding: 24px; }
+  .msg { max-width: 92%; }
+  .chat-msgs { height: 280px; padding: 16px; }
+  .chat-head { padding: 14px 16px; }
+  .chat-inp { padding: 10px 12px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .nav-link:not(.nav-logo) { display: none; }
+  .hero h1 { font-size: 30px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions .x-btn { justify-content: center; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="orb"></div>
+<div class="orb"></div>
+<div class="orb"></div>
+<canvas id="wave-canvas"></canvas>
+
+<div class="app">
+
+  <nav>
+    <div class="nav-logo">Xoleric <span>∞</span></div>
+    <button class="nav-link active" data-target="hero">Bosh sahifa</button>
+    <button class="nav-link" data-target="about">Xususiyatlar</button>
+    <button class="nav-link" data-target="projects">Loyihalar</button>
+    <button class="nav-link" data-target="chat">Chat</button>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      AI-Native Operating System
+    </div>
+    <h1>Xoleric <span class="inf">∞</span></h1>
+    <p>
+      Sun'iy intellekt asosidagi operatsion tizim — mikrokerneldan tortib
+      xAI assistantgacha bo'lgan to'liq ekotizim.
+    </p>
+    <div class="hero-actions">
+      <a href="#projects" class="x-btn">Loyihalarni ko'rish</a>
+      <a href="#chat" class="x-btn">Suhbat</a>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="section-header">
+      <h2>Nega Xoleric?</h2>
+      <p>Har bir qatlam yangicha yondashuv — mikrokerneldan tortib AI gacha</p>
+    </div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="icon">🧠</div>
+        <h3>AI-Native</h3>
+        <p>Kernel darajasida integratsiyalangan sun'iy intellekt. xAI assistant tizim bilan birga ishlaydi.</p>
+        <span class="tag">Microkernel</span>
+      </div>
+      <div class="card">
+        <div class="icon">⚡</div>
+        <h3>Samaradorlik</h3>
+        <p>Rust tilida yozilgan mikrokerneL minimal resurs bilan maksimal unumdorlikni ta'minlaydi.</p>
+        <span class="tag">Rust</span>
+      </div>
+      <div class="card">
+        <div class="icon">🔒</div>
+        <h3>Xavfsizlik</h3>
+        <p>Har bir jarayon alohida izolyatsiyada. Zero-Trust modeli asosida real-time monitoring.</p>
+        <span class="tag">Zero-Trust</span>
+      </div>
+      <div class="card">
+        <div class="icon">🌐</div>
+        <h3>Ekotizim</h3>
+        <p>ISO yaratish, paket boshqaruvi, containerlar va AI agentlar — hammasi bir platformada.</p>
+        <span class="tag">All-in-One</span>
+      </div>
+      <div class="card">
+        <div class="icon">💬</div>
+        <h3>xAI</h3>
+        <p>Ollama asosidagi shaxsiy AI assistant. Tizimni boshqarish, kod yozish va tahlil.</p>
+        <span class="tag">Ollama</span>
+      </div>
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>XPKG</h3>
+        <p>O'ziga xos paket boshqaruvi. Bir buyruq bilan istalgan dasturni o'rnatish.</p>
+        <span class="tag">Package Manager</span>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="num">0.1</div>
+        <div class="lbl">Versiya</div>
+      </div>
+      <div class="stat">
+        <div class="num">Rust</div>
+        <div class="lbl">Kernel</div>
+      </div>
+      <div class="stat">
+        <div class="num">AI</div>
+        <div class="lbl">Asosiy</div>
+      </div>
+      <div class="stat">
+        <div class="num">∞</div>
+        <div class="lbl">Cheksiz</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="projects">
+    <div class="section-header">
+      <h2>Loyihalar</h2>
+      <p>Xoleric ekotizimidagi asosiy komponentlar va imkoniyatlar</p>
+    </div>
+    <div class="projects">
+      <div class="project">
+        <div class="prev p1">🧬</div>
+        <div class="body">
+          <h3>Xoleric Kernel</h3>
+          <p>Rust tilida yozilgan mikrokerneL. x86_64 va ARM64 arxitekturalarini qo'llab-quvvatlaydi.</p>
+          <div class="tags">
+            <span>Rust</span>
+            <span>Microkernel</span>
+            <span>x86_64</span>
+            <span>ARM64</span>
+          </div>
+        </div>
+      </div>
+      <div class="project">
+        <div class="prev p2">🤖</div>
+        <div class="body">
+          <h3>xAI Assistant</h3>
+          <p>Ollama asosidagi AI assistant. Tizim boshqaruvi, kod generatsiyasi va ma'lumot tahlili.</p>
+          <div class="tags">
+            <span>AI</span>
+            <span>Ollama</span>
+            <span>LLM</span>
+            <span>Assistant</span>
+          </div>
+        </div>
+      </div>
+      <div class="project">
+        <div class="prev p3">📀</div>
+        <div class="body">
+          <h3>ISO Builder</h3>
+          <p>To'liq ISO image yaratish tizimi. Microkernel va to'liq versiyalarni avtomatik build.</p>
+          <div class="tags">
+            <span>ISO</span>
+            <span>Builder</span>
+            <span>Automation</span>
+          </div>
+        </div>
+      </div>
+      <div class="project">
+        <div class="prev p4">📦</div>
+        <div class="body">
+          <h3>XPKG & Containerlar</h3>
+          <p>O'ziga xos paket boshqaruvi va container tizimi. Dasturlarni izolyatsiyada ishga tushirish.</p>
+          <div class="tags">
+            <span>Package Manager</span>
+            <span>Containers</span>
+            <span>Isolation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="chat">
+    <div class="section-header">
+      <h2>xAI Chat</h2>
+      <p>Xoleric AI assistenti bilan bevosita muloqot qiling</p>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-box">
+        <div class="chat-head">
+          <div class="av">xAI</div>
+          <div class="info">
+            <div class="name">xAI Assistant</div>
+            <div class="st"><span class="d"></span>Onlayn</div>
+          </div>
+          <button class="x-btn" id="chat-clear" style="padding: 8px 16px; font-size: 13px;">Tozalash</button>
+        </div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="msg ai">
+            Salom! Men Xoleric xAI assistentiman. Sizga qanday yordam bera olaman?
+          </div>
+        </div>
+        <div class="chat-inp">
+          <input type="text" id="chat-input" placeholder="Xabar yozing..." autocomplete="off">
+          <button class="x-btn" id="chat-send">Yuborish</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Xoleric ∞ — AI-Native Operating System</p>
+    <div class="links">
+      <a href="https://github.com/xolerc" target="_blank">GitHub</a>
+      <a href="#">Hujjatlar</a>
+      <a href="#">Aloqa</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const canvas = document.getElementById('wave-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    const waves = [
+      { a: 20, f: 0.007, s: 0.35, c: 'rgba(99,102,241,0.07)', oy: 0.28 },
+      { a: 26, f: 0.011, s: 0.5, c: 'rgba(99,102,241,0.05)', oy: 0.42 },
+      { a: 16, f: 0.005, s: 0.28, c: 'rgba(139,92,246,0.06)', oy: 0.52 },
+      { a: 22, f: 0.009, s: 0.38, c: 'rgba(3,3,197,0.05)', oy: 0.35 },
+    ];
+
+    waves.forEach(function(w) {
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 2) {
+        const y = H * w.oy
+          + Math.sin(x * w.f + t * w.s) * w.a
+          + Math.sin(x * w.f * 2.5 + t * w.s * 1.4) * (w.a * 0.35);
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H);
+      ctx.closePath();
+      ctx.fillStyle = w.c;
+      ctx.fill();
+    });
+
+    t += 1;
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+
+  const navLinks = document.querySelectorAll('.nav-link[data-target]');
+
+  navLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      navLinks.forEach(function(l) { l.classList.remove('active'); });
+      link.classList.add('active');
+      const target = document.getElementById(link.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', function() {
+    let cur = 'hero';
+    sections.forEach(function(s) {
+      if (s.getBoundingClientRect().top < 300) cur = s.id;
+    });
+    navLinks.forEach(function(l) {
+      l.classList.toggle('active', l.dataset.target === cur);
+    });
+  });
+
+  const msgs = document.getElementById('chat-msgs');
+  const inp = document.getElementById('chat-input');
+  const send = document.getElementById('chat-send');
+  const clear = document.getElementById('chat-clear');
+
+  const reps = [
+    "Xoleric — AI-native operatsion tizim. Rust tilida yozilgan mikrokerneL, Ollama asosidagi xAI assistant va to'liq ISO builder.",
+    "Versiya 0.1. MikrokerneL, xAI, ISO builder va XPKG paket boshqaruvi mavjud. Har bir komponent mustaqil.",
+    "MikrokerneL Rust tilida. Minimal resurs bilan maksimal xavfsizlik. x86_64 va ARM64 qo'llab-quvvatlanadi.",
+    "xAI assistant Ollama asosida. Tabiiy tilda muloqot, kod yozish, tizim boshqaruvi va tahlil.",
+    "XPKG — bir buyruq bilan dastur o'rnatish, yangilash va olib tashlash. O'ziga xos paket formati.",
+    "ISO builder — bir buyruq bilan to'liq ISO image. Microkernel yoki to'liq versiyani tanlash.",
+    "Kelajak rejalari: grafik interfeys, tarmoq steki, qurilma drayverlari va kengaytirilgan AI.",
+    "Container tizimi — dasturlarni izolyatsiyada ishga tushirish. Har bir container alohida muhit.",
+    "Zero-Trust xavfsizlik modeli. Har bir jarayon va so'rov tekshiriladi va tasdiqlanadi.",
+    "Xoleric ochiq kodli. GitHub'da barcha manba kodlari mavjud. Hamma hissa qo'shishi mumkin.",
+  ];
+
+  let ri = 0;
+
+  function addMsg(text, role) {
+    const d = document.createElement('div');
+    d.className = 'msg ' + role;
+    d.textContent = text;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTy() {
+    const d = document.createElement('div');
+    d.className = 'msg ai';
+    d.id = 'ty';
+    d.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function hideTy() {
+    const d = document.getElementById('ty');
+    if (d) d.remove();
+  }
+
+  function sendMsg() {
+    const text = inp.value.trim();
+    if (!text) return;
+    addMsg(text, 'user');
+    inp.value = '';
+    showTy();
+    setTimeout(function() {
+      hideTy();
+      addMsg(reps[ri % reps.length], 'ai');
+      ri++;
+    }, 700 + Math.random() * 500);
+  }
+
+  send.addEventListener('click', sendMsg);
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') sendMsg();
+  });
+
+  clear.addEventListener('click', function() {
+    msgs.innerHTML = '<div class="msg ai">Salom! Men Xoleric xAI assistentiman. Sizga qanday yordam bera olaman?</div>';
+    ri = 0;
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+})();
+</script>
+
+</body>
+</html>
