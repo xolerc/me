@@ -217,11 +217,13 @@ function renderMessage(m) {
   const avatar = m.fromAvatar && m.fromAvatar !== '?' ? m.fromAvatar : null;
   const time = m.time ? new Date(m.time).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }) : '';
   const media = m.media ? `<div class="msg-media"><img src="${m.media}" loading="lazy" onclick="window.open('${m.media}','_blank')" /></div>` : '';
+  const fromId = m.fromId || '';
+  const canClick = !isOwn && fromId && currentConvId && document.querySelector('.chat-list-item[data-conv-id="' + currentConvId + '"]')?.querySelector('.cli-avatar')?.textContent !== '💬';
   return `
     <div class="${cls} msg-wrapper" data-id="${m.id || ''}">
-      <div class="msg-avatar" style="${avatar ? `background-image:url(${avatar});background-size:cover` : 'background:rgba(99,102,241,0.1);color:#818cf8'}">${avatar ? '' : (m.fromName ? m.fromName[0].toUpperCase() : '?')}</div>
+      <div class="msg-avatar${canClick ? ' msg-avatar-click' : ''}" onclick="${canClick ? `openPrivateChat('${fromId}')` : ''}" style="${avatar ? `background-image:url(${avatar});background-size:cover` : 'background:rgba(99,102,241,0.1);color:#818cf8'}">${avatar ? '' : (m.fromName ? m.fromName[0].toUpperCase() : '?')}</div>
       <div class="msg-body">
-        ${isOwn ? '' : `<span class="msg-author">${escapeHtml(m.fromName || 'Anon')}</span>`}
+        ${isOwn ? '' : `<span class="msg-author${canClick ? ' msg-author-click' : ''}" onclick="${canClick ? `openPrivateChat('${fromId}')` : ''}">${escapeHtml(m.fromName || 'Anon')}</span>`}
         <div class="${isOwn ? 'msg-bubble own' : 'msg-bubble'}">
           ${m.text ? `<div class="msg-text">${escapeHtml(m.text)}</div>` : ''}
           ${media}
@@ -239,6 +241,28 @@ function renderMessage(m) {
         </div>
       </div>
     </div>`;
+}
+
+async function openPrivateChat(userId) {
+  if (!currentUser || !userId || userId === currentUser.id) return;
+  const convs = await DB.getConversations();
+  let priv = convs.find(c =>
+    c.type === 'private' && c.members && c.members[currentUser.id] && c.members[userId]
+  );
+  if (priv) {
+    openConversation(priv.id);
+    loadConversations();
+    return;
+  }
+  const otherUser = await DB.getUser(userId);
+  priv = await DB.createConversation({
+    type: 'private',
+    name: otherUser?.username || 'Foydalanuvchi',
+    ownerId: currentUser.id,
+    members: { [currentUser.id]: true, [userId]: true },
+  });
+  await loadConversations();
+  openConversation(priv.id);
 }
 
 function getDateLabel(ts) {

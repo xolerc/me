@@ -862,6 +862,10 @@ nav {
   margin-bottom: 2px;
   display: block;
 }
+.msg-author-click { cursor: pointer; transition: 0.2s; }
+.msg-author-click:hover { color: #a5b4fc; text-decoration: underline; }
+.msg-avatar-click { cursor: pointer; transition: 0.2s; }
+.msg-avatar-click:hover { opacity: 0.8; }
 
 .msg-bubble {
   background: rgba(255,255,255,0.04);
