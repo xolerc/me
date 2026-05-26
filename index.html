@@ -90,6 +90,9 @@
             <div class="sidebar-header">
               <h3>XOLERIC CHAT</h3>
               <div class="sidebar-actions">
+                <button class="sidebar-create-btn" id="createChannelBtn" title="Kanal yaratish">📢</button>
+                <button class="sidebar-create-btn" id="createGroupBtn" title="Guruh yaratish">👥</button>
+                <button class="sidebar-create-btn" id="createPrivateBtn" title="Shaxsiy chat">💬</button>
                 <span class="online-badge" id="onlineBadge">0</span>
               </div>
             </div>
@@ -101,20 +104,21 @@
               </div>
               <button class="sidebar-edit-btn" id="editProfileBtn">✎</button>
             </div>
-            <div class="chat-online" id="chatOnline"></div>
-            <div class="sidebar-chats">
-              <div class="chat-list-item active"><div class="cli-avatar">💬</div><div class="cli-info"><span class="cli-name">Umumiy Chat</span><span class="cli-msg">Barcha xabarlar</span></div></div>
+            <div class="sidebar-chats" id="sidebarChats">
+              <div class="conv-empty">Yuklanmoqda...</div>
             </div>
           </div>
           <div class="chat-main">
             <div class="chat-header">
-              <span class="chat-header-name">Umumiy Chat</span>
+              <span class="chat-header-name" id="chatHeaderName">Xoleric Chat</span>
+              <span class="chat-header-meta" id="chatHeaderMeta">super chat</span>
               <span class="chat-header-count" id="onlineCount">0 online</span>
             </div>
+            <div id="chatJoinArea" style="display:none;padding:24px;text-align:center;"></div>
             <div class="chat-messages" id="chatMessages">
-              <div class="chat-loading">Xabarlar yuklanmoqda...</div>
+              <div class="chat-loading">Chatni boshlash uchun konversatsiyani tanlang</div>
             </div>
-            <div class="chat-input-area">
+            <div class="chat-input-area" id="chatInputArea" style="display:none">
               <label class="chat-media-btn" id="chatMediaBtn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                 <input type="file" id="chatMediaInput" accept="image/*" hidden />
@@ -131,6 +135,24 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- Create Conversation Modal -->
+  <div class="modal-overlay" id="createModal" style="display:none">
+    <div class="modal">
+      <div class="modal-header"><h3 id="createModalTitle">Yangi chat</h3></div>
+      <div class="modal-body">
+        <input class="modal-input" id="createConvName" placeholder="Nomi" maxlength="50" />
+        <textarea class="modal-input modal-textarea" id="createConvDesc" placeholder="Tavsif (ixtiyoriy)" rows="2"></textarea>
+        <div id="createUserSelectWrap" style="display:none;margin-bottom:12px;">
+          <select class="modal-input" id="createConvUsers" style="border-radius:999px;padding:12px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#fff;font-family:inherit;font-size:14px;width:100%;outline:none;">
+            <option value="">Foydalanuvchini tanlang...</option>
+          </select>
+        </div>
+        <button class="modal-btn" id="createConvSave">Yaratish</button>
+        <button class="modal-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);margin-top:8px;" onclick="document.getElementById('createModal').style.display='none'">Bekor qilish</button>
+      </div>
+    </div>
   </div>
 
   <!-- CONTACT TAB -->
