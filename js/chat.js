@@ -9,7 +9,10 @@ let initResolved = false;
 
 async function dbPing() {
   try {
-    await fetch(DB_URL + '/.json?shallow=true', { signal: AbortSignal.timeout(8000) });
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    await fetch(DB_URL + '/.json?shallow=true', { signal: ctrl.signal, cache: 'no-store' });
+    clearTimeout(t);
     return true;
   } catch {
     return false;
@@ -30,7 +33,10 @@ async function ensureUser() {
   let uid = localStorage.getItem('xolerc_uid');
   if (uid) {
     try {
-      const user = await DB.getUser(uid);
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 4000);
+      const user = await DB.getUser(uid, ctrl.signal);
+      clearTimeout(t);
       if (user && user.id) { currentUser = user; localStorage.setItem(CACHE_KEY, JSON.stringify(user)); return user; }
     } catch {}
     const cached = localStorage.getItem(CACHE_KEY);
@@ -40,17 +46,43 @@ async function ensureUser() {
 }
 
 (async function init() {
-  // Wait for Firebase connection
-  await dbPing();
+  // Phase 1: try cached user instantly (no network)
+  const cachedRaw = localStorage.getItem(CACHE_KEY);
+  const uid = localStorage.getItem('xolerc_uid');
+  let cachedUser = null;
+  if (cachedRaw && uid) {
+    try { const p = JSON.parse(cachedRaw); if (p && p.id === uid) cachedUser = p; } catch {}
+  }
 
+  if (cachedUser) {
+    currentUser = cachedUser;
+    document.getElementById('setupModal').style.display = 'none';
+    updateSidebarUser(cachedUser);
+    document.getElementById('sidebarChats').innerHTML = '<div class="conv-empty">Yuklanmoqda...</div>';
+    hideLoading();
+    // Fire-and-forget: sync with Firebase in background
+    DB.updateUser(cachedUser.id, { online: true }).catch(() => {});
+    DB.migrateOldMessages().catch(() => {});
+    loadConversations().catch(() => {});
+    initResolved = true;
+    return;
+  }
+
+  // Phase 2: no cache — wait for Firebase then decide
+  const safetyTimer = setTimeout(() => {
+    const m = document.getElementById('setupModal');
+    if (m) m.style.display = 'flex';
+    hideLoading();
+  }, 6000);
+
+  await dbPing();
   const user = await ensureUser();
+  clearTimeout(safetyTimer);
+
   if (user) {
     document.getElementById('setupModal').style.display = 'none';
     updateSidebarUser(user);
-    DB.updateUser(user.id, { online: true });
-    await DB.migrateOldMessages();
     await loadConversations();
-    // auto-open first conversation
     const list = document.querySelectorAll('.chat-list-item');
     if (list.length > 0) list[0].click();
   } else {

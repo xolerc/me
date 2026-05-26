@@ -11,8 +11,8 @@ const DB = {
     return data;
   },
 
-  async getUser(id) {
-    const r = await fetch(U(`/users/${id}.json`));
+  async getUser(id, signal) {
+    const r = await fetch(U(`/users/${id}.json`), { signal });
     return r.json();
   },
 
