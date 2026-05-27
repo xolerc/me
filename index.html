@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
 
@@ -31,17 +31,15 @@
 
     <section class="workspace">
 
-      <div class="workspace-content">
-
       <!-- HOME / Workspace -->
       <div class="tab-content active" id="tab-home">
-        <div class="card hero-card">
+        <div class="hero-glass">
           <h1 class="hero-title"><span class="hero-glow">XOLERIC</span></h1>
           <p class="hero-sub">DASTURCHI &bull; DIZAYNER &bull; MUHANDIS</p>
           <p class="hero-desc">Frontend arxitektori. Tizimlar quruvchi. Interfeyslar yaratuvchi.</p>
           <div class="hero-actions">
-            <button class="btn glass-btn" onclick="switchTab('projects')">Loyihalar</button>
-            <button class="btn glass-btn" onclick="switchTab('chat')">Chat</button>
+            <button class="glass-btn" onclick="switchTab('projects')">Loyihalar</button>
+            <button class="glass-btn glass-outline" onclick="switchTab('chat')">Chat</button>
           </div>
         </div>
       </div>
@@ -149,7 +147,7 @@
           <p class="page-sub">Video pleer</p>
         </div>
         <div class="playme-main">
-          <div class="card playme-player-wrap">
+          <div class="glass-card playme-player-wrap">
             <video id="playmeVideo" class="playme-video" playsinline preload="auto"></video>
             <div class="playme-controls" id="playmeControls">
               <div class="playme-controls-bottom">
@@ -186,7 +184,7 @@
           <h2 class="page-title">Settings</h2>
           <p class="page-sub">Ilova sozlamalari va yuklamalar</p>
         </div>
-        <div class="card settings-card">
+        <div class="settings-card">
           <h3>⬇ XOLERIC APK</h3>
           <p>Android qurilmangizga XOLERIC ilovasini yuklab oling.</p>
           <div style="display:flex;gap:12px;flex-wrap:wrap;">
@@ -194,7 +192,7 @@
             <a href="xoleric.apk" class="btn glass-btn glass-outline">⬇ Eski versiya</a>
           </div>
         </div>
-        <div class="card settings-card">
+        <div class="settings-card">
           <h3>⚙ Tema</h3>
           <p>Sayt ko'rinishini o'zgartirish</p>
           <div class="theme-grid">
@@ -230,11 +228,11 @@
 
 <audio id="bgMusic" src="bg-music.mp3" loop></audio>
 
-<script src="js/main.js?v=9"></script>
-<script src="js/db.js?v=9"></script>
-<script src="js/chat.js?v=9"></script>
-<script src="js/repos.js?v=9"></script>
-<script src="js/playme.js?v=9"></script>
+<script src="js/main.js?v=10"></script>
+<script src="js/db.js?v=10"></script>
+<script src="js/chat.js?v=10"></script>
+<script src="js/repos.js?v=10"></script>
+<script src="js/playme.js?v=10"></script>
 <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>
