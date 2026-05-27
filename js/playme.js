@@ -1,7 +1,5 @@
 const VIDEOS_PATH = 'https://xolerc.github.io/me/videos';
 
-const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
-
 const DEFAULT_VIDEOS = [
   { file: VIDEOS_PATH + '/2_5211184992486459614.mp4', title: 'Video 1' },
   { file: VIDEOS_PATH + '/2_5235775282278869717.mp4', title: 'Video 2' },
@@ -19,9 +17,11 @@ const DEFAULT_VIDEOS = [
 
 const video = document.getElementById('playmeVideo');
 const list = document.getElementById('playmeList');
+const titleEl = document.getElementById('playmeVideoTitle');
 const playBtn = document.getElementById('playmePlayBtn');
 const prevBtn = document.getElementById('playmePrevBtn');
 const nextBtn = document.getElementById('playmeNextBtn');
+const fullBtn = document.getElementById('playmeFullBtn');
 const currentEl = document.getElementById('playmeCurrent');
 const durEl = document.getElementById('playmeDuration');
 const progressEl = document.getElementById('playmeProgressFill');
@@ -42,17 +42,17 @@ function formatTime(s) {
 function playVideo(index) {
   if (index < 0 || index >= DEFAULT_VIDEOS.length) return;
   currentIndex = index;
-  video.src = DEFAULT_VIDEOS[index].file;
+  const v = DEFAULT_VIDEOS[index];
+  video.src = v.file;
   video.play().catch(() => {});
+  titleEl.textContent = v.title;
   renderList();
 }
 
 function renderList() {
   list.innerHTML = DEFAULT_VIDEOS.map((v, i) => `
     <div class="playme-item${i === currentIndex ? ' active' : ''}" data-index="${i}">
-      <div class="playme-item-thumb">
-        <span class="playme-item-num">${String(i + 1).padStart(2, '0')}</span>
-      </div>
+      <span class="playme-item-num">${String(i + 1).padStart(2, '0')}</span>
       <div class="playme-item-body">
         <span class="playme-item-title">${v.title}</span>
       </div>
@@ -61,6 +61,8 @@ function renderList() {
   list.querySelectorAll('.playme-item').forEach(item => {
     item.addEventListener('click', () => playVideo(parseInt(item.dataset.index)));
   });
+  const active = list.querySelector('.playme-item.active');
+  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 playBtn.addEventListener('click', () => {
@@ -75,6 +77,11 @@ prevBtn.addEventListener('click', () => {
 
 nextBtn.addEventListener('click', () => {
   playVideo((currentIndex + 1) % DEFAULT_VIDEOS.length);
+});
+
+fullBtn.addEventListener('click', () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else video.requestFullscreen();
 });
 
 video.addEventListener('play', () => { playBtn.textContent = '⏸'; });
@@ -135,9 +142,7 @@ volumeIcon.addEventListener('click', () => {
 
 video.addEventListener('error', () => {
   const err = video.error;
-  if (err?.code === 3) {
-    playBtn.textContent = '⚠';
-  }
+  if (err?.code === 3) playBtn.textContent = '⚠';
 });
 
 renderList();

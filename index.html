@@ -11,6 +11,12 @@
 </head>
 <body>
 
+<div id="loadingOverlay">
+  <div class="loader-ring"></div>
+  <div class="loader-text">XOLERIC</div>
+  <div class="loader-sub">Tizim yuklanmoqda...</div>
+</div>
+
 <div class="app">
 
   <aside class="sidebar">
@@ -30,9 +36,10 @@
     <header class="topbar">XOLERIC <span>∞</span></header>
 
     <section class="workspace">
+      <div class="tabs-track">
 
       <!-- HOME / Workspace -->
-      <div class="tab-content active" id="tab-home">
+      <div class="tab-content" id="tab-home">
         <div class="hero-glass">
           <h1 class="hero-title"><span class="hero-glow">XOLERIC</span></h1>
           <p class="hero-sub">DASTURCHI &bull; DIZAYNER &bull; MUHANDIS</p>
@@ -57,53 +64,73 @@
 
       <!-- CHAT / Neural Chat -->
       <div class="tab-content" id="tab-chat">
-        <div class="chat-container" id="chatContainer">
-          <div class="chat-sidebar" id="chatSidebar">
-            <div class="sidebar-header">
-              <h3>NEURAL CHAT</h3>
-              <div class="sidebar-actions">
-                <button class="sidebar-create-btn" id="createChannelBtn" title="Kanal yaratish">+</button>
-                <button class="sidebar-create-btn" id="createGroupBtn" title="Guruh yaratish">+</button>
-                <button class="sidebar-create-btn" id="createPrivateBtn" title="Shaxsiy chat">+</button>
-                <span class="online-badge" id="onlineBadge">0</span>
+        <div class="chat-block" id="chatContainer">
+
+          <div class="chat-depth"></div>
+
+          <div class="chat-loader" id="chatLoader">
+            <div class="chat-loader-ring"></div>
+            <div class="chat-loader-text">Neural Chat</div>
+            <div class="chat-loader-sub">Serverga ulanmoqda...</div>
+          </div>
+
+          <div class="chat-head">
+            <div class="chat-head-left">
+              <button class="chat-toggle" id="chatToggle" title="Konversiyalar">☰</button>
+              <div class="chat-user" id="sidebarUser">
+                <div class="chat-user-avatar" id="sidebarAvatar">?</div>
+                <div class="chat-user-info">
+                  <span class="chat-user-name" id="sidebarName">Yuklanmoqda...</span>
+                  <span class="chat-user-status" id="sidebarStatus">online</span>
+                </div>
+                <button class="chat-edit-btn" id="editProfileBtn">✎</button>
               </div>
             </div>
-            <div class="sidebar-user" id="sidebarUser">
-              <div class="sidebar-user-avatar" id="sidebarAvatar">?</div>
-              <div class="sidebar-user-info">
-                <span class="sidebar-user-name" id="sidebarName">Yuklanmoqda...</span>
-                <span class="sidebar-user-status" id="sidebarStatus">online</span>
-              </div>
-              <button class="sidebar-edit-btn" id="editProfileBtn">✎</button>
+            <div class="chat-head-center">
+              <span class="chat-now-name" id="chatHeaderName">Xoleric Chat</span>
+              <span class="chat-now-meta" id="chatHeaderMeta">super chat</span>
             </div>
-            <div class="sidebar-chats" id="sidebarChats">
-              <div class="conv-empty">Yuklanmoqda...</div>
+            <div class="chat-head-right">
+              <button class="chat-action-btn" id="createChannelBtn" title="Kanal">+</button>
+              <button class="chat-action-btn" id="createGroupBtn" title="Guruh">+</button>
+              <button class="chat-action-btn" id="createPrivateBtn" title="Shaxsiy">+</button>
+              <span class="chat-online" id="onlineCount">0 online</span>
+              <span class="chat-badge" id="onlineBadge">0</span>
             </div>
           </div>
-          <div class="chat-main">
-            <div class="chat-header">
-              <span class="chat-header-name" id="chatHeaderName">Xoleric Chat</span>
-              <span class="chat-header-meta" id="chatHeaderMeta">super chat</span>
-              <span class="chat-header-count" id="onlineCount">0 online</span>
-            </div>
-            <div id="chatJoinArea" style="display:none;padding:24px;text-align:center;"></div>
-            <div class="chat-messages" id="chatMessages">
-              <div class="chat-loading">Chatni boshlash uchun konversatsiyani tanlang</div>
-            </div>
-            <div class="chat-input-area" id="chatInputArea" style="display:none">
-              <label class="chat-media-btn" id="chatMediaBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                <input type="file" id="chatMediaInput" accept="image/*" hidden />
-              </label>
-              <div class="chat-preview" id="chatPreview" style="display:none">
-                <img id="chatPreviewImg" /><button id="chatPreviewRemove">&times;</button>
+
+          <div class="chat-body">
+            <div class="chat-convs-wrap" id="chatConvsWrap">
+              <div class="chat-convs" id="sidebarChats">
+                <div class="conv-empty">Yuklanmoqda...</div>
               </div>
-              <textarea class="chat-input" id="chatInput" placeholder="Xabar yozing..." rows="1"></textarea>
-              <button class="chat-send-btn" id="chatSendBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-              </button>
+            </div>
+
+            <div class="chat-main">
+              <div class="chat-panel-header" id="chatPanelHeader">
+                <span class="chat-panel-name" id="chatPanelName">Xoleric Chat</span>
+                <span class="chat-panel-meta" id="chatPanelMeta">super chat</span>
+              </div>
+              <div id="chatJoinArea" style="display:none"></div>
+              <div class="chat-msgs" id="chatMessages">
+                <div class="chat-empty">Chatni boshlash uchun konversiyani tanlang</div>
+              </div>
+              <div class="chat-input-bar" id="chatInputArea" style="display:none">
+                <label class="chat-media-btn" id="chatMediaBtn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                  <input type="file" id="chatMediaInput" accept="image/*" hidden />
+                </label>
+                <div class="chat-msg-preview" id="chatPreview" style="display:none">
+                  <img id="chatPreviewImg" /><button id="chatPreviewRemove">&times;</button>
+                </div>
+                <textarea class="chat-input" id="chatInput" placeholder="Xabar yozing..." rows="1"></textarea>
+                <button class="chat-send-btn" id="chatSendBtn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -125,6 +152,52 @@
         </div>
       </div>
 
+      <!-- PLAYME / Interface -->
+      <div class="tab-content" id="tab-playme">
+        <div class="page-header">
+          <h2 class="page-title">Interface</h2>
+          <p class="page-sub">Video pleer</p>
+        </div>
+        <div class="playme-layout">
+          <div class="playme-player-col">
+            <div class="glass-card playme-player-wrap">
+              <video id="playmeVideo" class="playme-video" playsinline preload="auto"></video>
+              <div class="playme-controls" id="playmeControls">
+                <div class="playme-controls-bottom">
+                  <div class="playme-progress" id="playmeProgress">
+                    <div class="playme-progress-fill" id="playmeProgressFill"></div>
+                  </div>
+                  <div class="playme-controls-row">
+                    <div class="playme-controls-left">
+                      <button class="playme-btn playme-btn-play" id="playmePlayBtn">▶</button>
+                      <button class="playme-btn" id="playmePrevBtn">⏮</button>
+                      <button class="playme-btn" id="playmeNextBtn">⏭</button>
+                      <span class="playme-time" id="playmeCurrent">0:00</span>
+                      <span class="playme-time-sep">/</span>
+                      <span class="playme-time" id="playmeDuration">0:00</span>
+                    </div>
+                    <div class="playme-controls-right">
+                      <div class="playme-volume-wrap">
+                        <button class="playme-btn" id="playmeVolumeIcon">🔊</button>
+                        <input type="range" class="playme-volume" id="playmeVolume" min="0" max="1" step="0.05" value="0.5" />
+                      </div>
+                      <button class="playme-btn playme-btn-full" id="playmeFullBtn">⛶</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="playme-video-info" id="playmeVideoInfo">
+              <h3 class="playme-video-title" id="playmeVideoTitle">Video 1</h3>
+            </div>
+          </div>
+          <div class="playme-list-col">
+            <div class="playme-list-header">Pleer ro'yxati</div>
+            <div class="playme-list" id="playmeList"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- CONTACT / Control Hub -->
       <div class="tab-content" id="tab-contact">
         <div class="page-header">
@@ -137,43 +210,6 @@
           <a href="https://t.me/wxoleric" target="_blank" class="contact-btn">TELEGRAM</a>
           <a href="https://youtube.com/@xoleric" target="_blank" class="contact-btn">YOUTUBE</a>
           <a href="mailto:corexoleric@gmail.com" class="contact-btn">EMAIL</a>
-        </div>
-      </div>
-
-      <!-- PLAYME / Interface -->
-      <div class="tab-content" id="tab-playme">
-        <div class="page-header">
-          <h2 class="page-title">Interface</h2>
-          <p class="page-sub">Video pleer</p>
-        </div>
-        <div class="playme-main">
-          <div class="glass-card playme-player-wrap">
-            <video id="playmeVideo" class="playme-video" playsinline preload="auto"></video>
-            <div class="playme-controls" id="playmeControls">
-              <div class="playme-controls-bottom">
-                <div class="playme-progress" id="playmeProgress">
-                  <div class="playme-progress-fill" id="playmeProgressFill"></div>
-                </div>
-                <div class="playme-controls-row">
-                  <div class="playme-controls-left">
-                    <button class="playme-btn playme-btn-play" id="playmePlayBtn">▶</button>
-                    <button class="playme-btn" id="playmePrevBtn">⏮</button>
-                    <button class="playme-btn" id="playmeNextBtn">⏭</button>
-                    <span class="playme-time" id="playmeCurrent">0:00</span>
-                    <span class="playme-time-sep">/</span>
-                    <span class="playme-time" id="playmeDuration">0:00</span>
-                  </div>
-                  <div class="playme-controls-right">
-                    <div class="playme-volume-wrap">
-                      <button class="playme-btn" id="playmeVolumeIcon">🔊</button>
-                      <input type="range" class="playme-volume" id="playmeVolume" min="0" max="1" step="0.05" value="0.5" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="playme-list" id="playmeList"></div>
         </div>
       </div>
 
@@ -206,6 +242,7 @@
         </div>
       </div>
 
+    </div>
     </section>
   </main>
 

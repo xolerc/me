@@ -28,6 +28,11 @@ function hideLoading() {
   document.querySelector('.app').style.opacity = '1';
 }
 
+function hideChatLoader() {
+  const loader = document.getElementById('chatLoader');
+  if (loader) loader.classList.add('hidden');
+}
+
 // ===== USER SETUP =====
 async function ensureUser() {
   let uid = localStorage.getItem('xolerc_uid');
@@ -60,6 +65,7 @@ async function ensureUser() {
     updateSidebarUser(cachedUser);
     document.getElementById('sidebarChats').innerHTML = '<div class="conv-empty">Yuklanmoqda...</div>';
     hideLoading();
+    hideChatLoader();
     // Fire-and-forget: sync with Firebase in background
     DB.updateUser(cachedUser.id, { online: true }).catch(() => {});
     DB.migrateOldMessages().catch(() => {});
@@ -73,6 +79,7 @@ async function ensureUser() {
     const m = document.getElementById('setupModal');
     if (m) m.style.display = 'flex';
     hideLoading();
+    hideChatLoader();
   }, 6000);
 
   await dbPing();
@@ -89,6 +96,7 @@ async function ensureUser() {
     document.getElementById('setupModal').style.display = 'flex';
   }
   hideLoading();
+  hideChatLoader();
   initResolved = true;
 })();
 

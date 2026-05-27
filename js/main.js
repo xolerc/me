@@ -1,4 +1,3 @@
-// ===== MOTIVATSION BILDIRISHNOMALAR =====
 const MOTIVATION_QUOTES = [
   "Uyg'on, Xoleric...",
   "Tizim seni kutmoqda...",
@@ -47,29 +46,20 @@ const MOTIVATION_QUOTES = [
 
 (function() {
   if (!('Notification' in window)) return;
-  if (Notification.permission === 'granted') {
-    scheduleMotivation();
-  } else if (Notification.permission !== 'denied') {
-    Notification.requestPermission().then(p => {
-      if (p === 'granted') scheduleMotivation();
-    });
+  if (Notification.permission === 'granted') scheduleMotivation();
+  else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(p => { if (p === 'granted') scheduleMotivation(); });
   }
 })();
 
 function scheduleMotivation() {
-  function sendMotivation() {
+  function send() {
     if (Notification.permission !== 'granted') return;
-    const quote = MOTIVATION_QUOTES[Math.floor(Math.random() * MOTIVATION_QUOTES.length)];
-    try {
-      new Notification('XOLERIC ∞', {
-        body: quote,
-        icon: 'icon.png',
-        vibrate: [200, 100, 200],
-      });
-    } catch {}
+    const q = MOTIVATION_QUOTES[Math.floor(Math.random() * MOTIVATION_QUOTES.length)];
+    try { new Notification('XOLERIC ∞', { body: q, icon: 'icon.png', vibrate: [200,100,200] }); } catch {}
   }
-  sendMotivation();
-  setInterval(sendMotivation, 5 * 60 * 60 * 1000); // 5 soat
+  send();
+  setInterval(send, 5 * 60 * 60 * 1000);
 }
 
 document.addEventListener('contextmenu', e => e.preventDefault());
@@ -80,55 +70,108 @@ document.addEventListener('keydown', e => {
   if (e.key === 'PrintScreen' || e.key === 'F12') e.preventDefault();
 });
 
+const TABS = ['home','projects','chat','playme','contact','settings'];
+const TAB_NAMES = { home:'Ish maydoni', projects:'Loyihalar', playme:'Pleer', chat:'Chat', contact:'Aloqa', settings:'Sozlamalar' };
+
+let currentTab = 0;
+let tabHistory = [0];
+
+function navigateTo(idx, record) {
+  if (idx < 0 || idx >= TABS.length || idx === currentTab) return;
+  currentTab = idx;
+  const track = document.querySelector('.tabs-track');
+  if (track) track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === TABS[idx]));
+  if (record) {
+    tabHistory.push(idx);
+    history.pushState({ tab: idx }, '');
+  }
+}
+
 function switchTab(name) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-  document.querySelectorAll('.tab-content').forEach(d => d.classList.toggle('active', d.id === 'tab-' + name));
-  const titles = { home:'Ish maydoni', projects:'Loyihalar', playme:'Pleer', chat:'Chat', contact:'Aloqa', settings:'Sozlamalar' };
-  const titleEl = document.getElementById('topbarTitle');
-  if (titleEl) titleEl.textContent = titles[name] || name;
-} 
+  const idx = TABS.indexOf(name);
+  if (idx >= 0) navigateTo(idx, true);
+}
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-window.addEventListener('load', () => {
-  const hash = location.hash.replace('#', '');
-  if (hash && document.getElementById('tab-' + hash)) switchTab(hash);
+// Touch swipe
+(function() {
+  const ws = document.querySelector('.workspace');
+  if (!ws) return;
+  let sx = 0, dx = 0, dragging = false;
+  ws.addEventListener('touchstart', e => { sx = e.touches[0].clientX; dragging = true; }, { passive: true });
+  ws.addEventListener('touchmove', e => { if (dragging) dx = e.touches[0].clientX - sx; }, { passive: true });
+  ws.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    if (Math.abs(dx) > 50) {
+      const dir = dx < 0 ? 1 : -1;
+      navigateTo(Math.max(0, Math.min(TABS.length - 1, currentTab + dir)), true);
+    }
+    dx = 0;
+  });
+})();
+
+// Back button — go to previous tab, not exit app
+window.addEventListener('popstate', e => {
+  // If we got a known tab from history, go there
+  if (e.state && e.state.tab !== undefined && e.state.tab !== currentTab) {
+    navigateTo(e.state.tab, false);
+    return;
+  }
+  // No state or same tab — use our internal stack
+  if (tabHistory.length > 1) {
+    tabHistory.pop(); // remove current
+    const prev = tabHistory[tabHistory.length - 1];
+    // Replace current history entry (don't push — avoid loop)
+    history.replaceState({ tab: prev }, '');
+    navigateTo(prev, false);
+  }
 });
 
-// Wave Canvas
+// Chat convs panel toggle
+document.addEventListener('click', e => {
+  const toggle = e.target.closest('#chatToggle');
+  if (!toggle) return;
+  const wrap = document.getElementById('chatConvsWrap');
+  if (wrap) wrap.classList.toggle('collapsed');
+});
+
+window.addEventListener('load', () => {
+  const hash = location.hash.replace('#', '');
+  const start = (hash && TABS.includes(hash)) ? TABS.indexOf(hash) : 0;
+  currentTab = start;
+  tabHistory = [start];
+  history.replaceState({ tab: start }, '');
+  const track = document.querySelector('.tabs-track');
+  if (track) track.style.transform = 'translateX(-' + (start * 100) + '%)';
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === TABS[start]));
+});
+
 (function() {
   const canvas = document.getElementById('wave-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let W, H, t = 0;
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   window.addEventListener('resize', resize);
   resize();
-
   function draw() {
     ctx.clearRect(0, 0, W, H);
-
     const waves = [
-      { a: 20, f: 0.007, s: 0.04, c: 'rgba(99,102,241,0.07)', oy: 0.28 },
-      { a: 26, f: 0.011, s: 0.06, c: 'rgba(99,102,241,0.05)', oy: 0.42 },
-      { a: 16, f: 0.005, s: 0.03, c: 'rgba(139,92,246,0.06)', oy: 0.52 },
-      { a: 22, f: 0.009, s: 0.04, c: 'rgba(3,3,197,0.05)', oy: 0.35 },
+      { a:20, f:0.007, s:0.04, c:'rgba(99,102,241,0.07)', oy:0.28 },
+      { a:26, f:0.011, s:0.06, c:'rgba(99,102,241,0.05)', oy:0.42 },
+      { a:16, f:0.005, s:0.03, c:'rgba(139,92,246,0.06)', oy:0.52 },
+      { a:22, f:0.009, s:0.04, c:'rgba(3,3,197,0.05)', oy:0.35 },
     ];
-
-    waves.forEach(function(w) {
+    waves.forEach(w => {
       ctx.beginPath();
       ctx.moveTo(0, H);
       for (let x = 0; x <= W; x += 2) {
-        const y = H * w.oy
-          + Math.sin(x * w.f + t * w.s) * w.a
-          + Math.sin(x * w.f * 2.5 + t * w.s * 1.4) * (w.a * 0.35);
+        const y = H * w.oy + Math.sin(x * w.f + t * w.s) * w.a + Math.sin(x * w.f * 2.5 + t * w.s * 1.4) * (w.a * 0.35);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(W, H);
@@ -136,15 +179,12 @@ window.addEventListener('load', () => {
       ctx.fillStyle = w.c;
       ctx.fill();
     });
-
     t += 1;
     requestAnimationFrame(draw);
   }
-
   draw();
 })();
 
-// Music
 (function() {
   const a = document.getElementById('bgMusic'), b = document.getElementById('musicToggle');
   if (!a || !b) return;
@@ -156,19 +196,17 @@ window.addEventListener('load', () => {
   });
 })();
 
-// Online badge auto-update from chat
 window.updateOnlineBadge = function(count) {
   const badge = document.getElementById('onlineBadge');
   if (badge) badge.textContent = count || '0';
 };
 
-// Theme switch
 const themes = {
-  dark:   { bg:'#000', bg2:'#0a0a0f', card:'#12121a', border:'rgba(255,255,255,0.04)', text:'#fff', text2:'rgba(255,255,255,0.5)', accent:'#818cf8' },
-  light:  { bg:'#f5f5f5', bg2:'#fff', card:'#fff', border:'rgba(0,0,0,0.08)', text:'#1a1a1a', text2:'#888', accent:'#6366f1' },
-  matrix: { bg:'#000', bg2:'#0a0a0a', card:'#0d0d0d', border:'rgba(0,255,65,0.08)', text:'#00ff41', text2:'#00aa2a', accent:'#00ff41' },
-  cyber:  { bg:'#0a0014', bg2:'#150020', card:'#1a0028', border:'rgba(255,0,255,0.08)', text:'#f0e6ff', text2:'#b088ff', accent:'#ff00ff' },
-  neon:   { bg:'#0d0d1a', bg2:'#1a1a2e', card:'#222244', border:'rgba(0,255,255,0.08)', text:'#e0ffff', text2:'#00cccc', accent:'#00ffff' },
+  dark:{ bg:'#000', bg2:'#0a0a0f', card:'#12121a', border:'rgba(255,255,255,0.04)', text:'#fff', text2:'rgba(255,255,255,0.5)', accent:'#818cf8' },
+  light:{ bg:'#f5f5f5', bg2:'#fff', card:'#fff', border:'rgba(0,0,0,0.08)', text:'#1a1a1a', text2:'#888', accent:'#6366f1' },
+  matrix:{ bg:'#000', bg2:'#0a0a0a', card:'#0d0d0d', border:'rgba(0,255,65,0.08)', text:'#00ff41', text2:'#00aa2a', accent:'#00ff41' },
+  cyber:{ bg:'#0a0014', bg2:'#150020', card:'#1a0028', border:'rgba(255,0,255,0.08)', text:'#f0e6ff', text2:'#b088ff', accent:'#ff00ff' },
+  neon:{ bg:'#0d0d1a', bg2:'#1a1a2e', card:'#222244', border:'rgba(0,255,255,0.08)', text:'#e0ffff', text2:'#00cccc', accent:'#00ffff' },
   minimal:{ bg:'#000', bg2:'#0a0a0a', card:'#111', border:'rgba(255,255,255,0.04)', text:'#fff', text2:'#555', accent:'#fff' },
 };
 
@@ -179,10 +217,7 @@ function applyTheme(name) {
   document.body.style.background = t.bg;
   document.body.style.color = t.text;
   localStorage.setItem('xolerc_theme', name);
-  document.querySelectorAll('.theme-btn').forEach(b => {
-    const active = b.dataset.theme === name;
-    b.classList.toggle('active', active);
-  });
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === name));
 }
 
 document.addEventListener('click', e => {
