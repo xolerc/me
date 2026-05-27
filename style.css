@@ -452,7 +452,8 @@ body {
   box-shadow: none;
 }
 .glass-outline:hover {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
 }
 
 .projects-loading {
@@ -593,20 +594,23 @@ body {
 .sidebar-create-btn {
   width: 28px;
   height: 28px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 16px;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(4px);
 }
 .sidebar-create-btn:hover {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.05);
+  border-color: var(--line-hover);
   color: var(--text);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
 }
 
 .online-badge {
@@ -664,16 +668,27 @@ body {
 }
 
 .sidebar-edit-btn {
-  border: none;
+  border: 1px solid transparent;
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   font-size: 14px;
   opacity: 0;
-  transition: 0.15s;
+  transition: all 0.25s ease;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sidebar-user:hover .sidebar-edit-btn {
   opacity: 1;
+}
+.sidebar-edit-btn:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--line-hover);
+  color: var(--text);
 }
 
 .sidebar-chats {
@@ -799,12 +814,20 @@ body {
 .chat-media-btn {
   cursor: pointer;
   color: var(--text-muted);
-  transition: 0.15s;
+  transition: all 0.25s ease;
   padding: 6px;
   flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(4px);
 }
 .chat-media-btn:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--line-hover);
   color: var(--text-secondary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .chat-preview {
@@ -823,14 +846,23 @@ body {
   position: absolute;
   top: -6px;
   right: -6px;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  border: none;
-  background: rgba(255,50,50,0.8);
+  border: 1px solid rgba(255,80,80,0.2);
+  background: rgba(200,30,30,0.7);
+  backdrop-filter: blur(4px);
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.chat-preview button:hover {
+  background: rgba(220,40,40,0.85);
+  box-shadow: 0 0 10px rgba(255,50,50,0.3);
 }
 
 .chat-input {
@@ -851,8 +883,8 @@ body {
 }
 
 .chat-send-btn {
-  border: none;
-  background: rgba(77,124,255,0.12);
+  border: 1px solid rgba(77,124,255,0.1);
+  background: rgba(77,124,255,0.1);
   color: var(--accent);
   width: 36px;
   height: 36px;
@@ -861,12 +893,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
   flex-shrink: 0;
+  backdrop-filter: blur(4px);
 }
 .chat-send-btn:hover {
-  background: rgba(77,124,255,0.18);
-  box-shadow: 0 0 16px rgba(77,124,255,0.12);
+  background: rgba(77,124,255,0.16);
+  border-color: rgba(77,124,255,0.2);
+  box-shadow: 0 0 20px rgba(77,124,255,0.15);
 }
 
 .chat-conv {
@@ -960,19 +994,22 @@ body {
 
 .modal-btn {
   width: 100%;
-  padding: 10px;
-  border: none;
+  padding: 11px;
+  border: 1px solid rgba(77,124,255,0.1);
   border-radius: 999px;
-  background: rgba(77,124,255,0.12);
+  background: rgba(77,124,255,0.08);
+  backdrop-filter: blur(8px);
   color: var(--accent);
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: 0.15s;
+  transition: all 0.25s ease;
 }
 .modal-btn:hover {
-  background: rgba(77,124,255,0.18);
+  background: rgba(77,124,255,0.14);
+  border-color: rgba(77,124,255,0.18);
+  box-shadow: 0 0 16px rgba(77,124,255,0.08);
 }
 
 .modal-btn-secondary {
@@ -980,10 +1017,13 @@ body {
   border: 1px solid var(--line);
   color: var(--text-secondary);
   margin-top: 8px;
+  backdrop-filter: blur(4px);
 }
 .modal-btn-secondary:hover {
+  background: rgba(255,255,255,0.03);
   border-color: var(--line-hover);
   color: var(--text);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
 
 .setup-avatar {
@@ -1013,6 +1053,15 @@ body {
   color: var(--text-muted);
   cursor: pointer;
   margin-bottom: 12px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  transition: all 0.25s ease;
+}
+.setup-avatar-label:hover {
+  background: rgba(255,255,255,0.03);
+  border-color: var(--line-hover);
+  color: var(--text-secondary);
 }
 
 .contact-grid {
@@ -1142,23 +1191,26 @@ body {
 }
 
 .playme-btn {
-  width: 32px;
-  height: 32px;
-  border: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255,255,255,0.04);
   border-radius: 8px;
-  background: transparent;
-  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.02);
+  backdrop-filter: blur(4px);
+  color: rgba(255,255,255,0.45);
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
   font-family: inherit;
 }
 .playme-btn:hover {
   background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.08);
   color: #fff;
+  box-shadow: 0 0 12px rgba(77,124,255,0.06);
 }
 
 .playme-btn-play { font-size: 18px; }
@@ -1327,18 +1379,21 @@ body {
   font-size: 12px;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(4px);
 }
 .theme-btn.active {
-  border-color: rgba(77,124,255,0.25);
+  border-color: rgba(77,124,255,0.2);
   background: rgba(77,124,255,0.08);
   color: var(--accent);
-  box-shadow: 0 0 12px rgba(77,124,255,0.06);
+  box-shadow: 0 0 16px rgba(77,124,255,0.06);
 }
 .theme-btn:hover {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.04);
+  border-color: var(--line-hover);
   color: var(--text);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 #bgMusic {
