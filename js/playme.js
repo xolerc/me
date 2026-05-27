@@ -448,6 +448,21 @@ el.playBtn.addEventListener('click', () => {
   else el.video.pause();
 });
 
+// Touch toggle controls on mobile
+const controlsBottom = document.querySelector('.playme-controls-bottom');
+if (el.video && controlsBottom) {
+  el.video.addEventListener('click', () => {
+    controlsBottom.classList.toggle('visible');
+    clearTimeout(window._ctrlTimer);
+    if (controlsBottom.classList.contains('visible')) {
+      window._ctrlTimer = setTimeout(() => controlsBottom.classList.remove('visible'), 4000);
+    }
+  });
+  el.video.addEventListener('play', () => {
+    setTimeout(() => controlsBottom.classList.remove('visible'), 2000);
+  });
+}
+
 el.prevBtn.addEventListener('click', () => {
   if (isShuffle) {
     shuffleIdx = Math.max(0, shuffleIdx - 2);
