@@ -11,11 +11,6 @@
 </head>
 <body>
 
-<video id="bgVideo" class="bg-video" muted playsinline></video>
-<div class="bg-overlay"></div>
-<button class="bg-video-toggle" id="bgVideoToggle" title="Ovoz">🔇</button>
-<button class="bg-video-next" id="bgVideoNext" title="Keyingi">→</button>
-
 <div class="app">
 
   <aside class="sidebar">
@@ -151,10 +146,37 @@
       <div class="tab-content" id="tab-playme">
         <div class="page-header">
           <h2 class="page-title">Interface</h2>
-          <p class="page-sub">Orqa fon videolari</p>
+          <p class="page-sub">Video pleer</p>
         </div>
-        <p class="playme-hint">Videolar ish maydoni orqa fonida avtomatik o'ynaydi</p>
-        <div class="playme-library" id="playmeLibrary"></div>
+        <div class="playme-main">
+          <div class="card playme-player-wrap">
+            <video id="playmeVideo" class="playme-video" playsinline preload="auto"></video>
+            <div class="playme-controls" id="playmeControls">
+              <div class="playme-controls-bottom">
+                <div class="playme-progress" id="playmeProgress">
+                  <div class="playme-progress-fill" id="playmeProgressFill"></div>
+                </div>
+                <div class="playme-controls-row">
+                  <div class="playme-controls-left">
+                    <button class="playme-btn playme-btn-play" id="playmePlayBtn">▶</button>
+                    <button class="playme-btn" id="playmePrevBtn">⏮</button>
+                    <button class="playme-btn" id="playmeNextBtn">⏭</button>
+                    <span class="playme-time" id="playmeCurrent">0:00</span>
+                    <span class="playme-time-sep">/</span>
+                    <span class="playme-time" id="playmeDuration">0:00</span>
+                  </div>
+                  <div class="playme-controls-right">
+                    <div class="playme-volume-wrap">
+                      <button class="playme-btn" id="playmeVolumeIcon">🔊</button>
+                      <input type="range" class="playme-volume" id="playmeVolume" min="0" max="1" step="0.05" value="0.5" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="playme-list" id="playmeList"></div>
+        </div>
       </div>
 
       <!-- SETTINGS -->
@@ -186,7 +208,6 @@
         </div>
       </div>
 
-    </div><!-- /workspace-content -->
     </section>
   </main>
 

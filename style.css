@@ -38,8 +38,6 @@ body {
   display: grid;
   grid-template-columns: 240px 1fr;
   height: 100vh;
-  position: relative;
-  z-index: 2;
 }
 
 /* ===== SIDEBAR ===== */
@@ -895,115 +893,188 @@ body {
   transform: translateY(-1px);
 }
 
-/* ===== BACKGROUND VIDEO ===== */
-.bg-video {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  opacity: 0.5;
-  pointer-events: none;
+/* ===== PLAYME ===== */
+.playme-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
-.bg-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at center, transparent 30%, rgba(10,14,26,0.5) 80%),
-    linear-gradient(180deg, rgba(10,14,26,0.6) 0%, transparent 30%, transparent 70%, rgba(10,14,26,0.6) 100%);
-  pointer-events: none;
-}
-.bg-video-toggle,
-.bg-video-next {
-  position: fixed;
-  z-index: 3;
-  bottom: 20px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+.playme-player-wrap {
+  padding: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
   border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--text-secondary);
-  font-size: 14px;
+  background: #000;
+  position: relative;
+}
+.playme-video {
+  width: 100%;
+  display: block;
+  aspect-ratio: 16/9;
+  background: #000;
+}
+.playme-controls {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  z-index: 10;
+  pointer-events: none;
+}
+.playme-controls > * {
+  pointer-events: auto;
+}
+.playme-controls-bottom {
+  padding: 8px 12px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+.playme-progress {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
   cursor: pointer;
+  position: relative;
+  margin-bottom: 4px;
+  transition: height 0.15s;
+}
+.playme-progress:hover { height: 6px; }
+.playme-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+.playme-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.playme-controls-left,
+.playme-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.playme-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s;
-  backdrop-filter: blur(8px);
+  font-family: inherit;
 }
-.bg-video-toggle:hover,
-.bg-video-next:hover {
-  background: var(--surface-hover);
-  color: var(--text);
-  border-color: var(--line-hover);
+.playme-btn:hover {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
 }
-.bg-video-toggle {
-  right: 66px;
+.playme-btn-play { font-size: 16px; }
+.playme-time {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  min-width: 30px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
-.bg-video-next {
-  right: 20px;
+.playme-time-sep {
+  font-size: 11px;
+  color: rgba(255,255,255,0.15);
 }
-
-.workspace-content {
-  position: relative;
-  z-index: 2;
+.playme-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
-
-/* ===== PLAYME LIBRARY ===== */
-.playme-hint {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-  font-weight: 300;
+.playme-volume {
+  width: 0;
+  opacity: 0;
+  transition: width 0.2s, opacity 0.2s;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none;
 }
-.playme-library {
+.playme-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.playme-volume-wrap:hover .playme-volume,
+.playme-volume:focus {
+  width: 50px;
+  opacity: 1;
+}
+.playme-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 10px;
 }
-.bg-vid-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 20px 12px;
+.playme-item {
   border-radius: var(--radius);
-  border: 1px solid var(--line);
+  overflow: hidden;
   background: var(--surface);
+  border: 1px solid var(--line);
   cursor: pointer;
   transition: all 0.2s;
-  font-family: inherit;
-  color: var(--text-secondary);
+  position: relative;
 }
-.bg-vid-item:hover {
+.playme-item:hover {
   background: var(--surface-hover);
   border-color: var(--line-hover);
-  color: var(--text);
   transform: translateY(-1px);
 }
-.bg-vid-item.active {
+.playme-item.active {
   border-color: rgba(77,124,255,0.2);
   background: var(--accent-dim);
-  color: var(--accent);
 }
-.bg-vid-item-num {
+.playme-item-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, rgba(77,124,255,0.1), rgba(99,102,241,0.05));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.playme-item-num {
   font-size: 28px;
   font-weight: 800;
   letter-spacing: -1px;
   opacity: 0.4;
   line-height: 1;
 }
-.bg-vid-item.active .bg-vid-item-num {
+.playme-item.active .playme-item-num {
   opacity: 1;
   color: var(--accent);
 }
-.bg-vid-item-title {
+.playme-item-body {
+  padding: 8px 12px;
+}
+.playme-item-title {
   font-size: 12px;
-  font-weight: 500;
-  text-align: center;
+  font-weight: 600;
+  color: var(--text);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===== SETTINGS ===== */
@@ -1129,21 +1200,8 @@ body {
     border-bottom: 1px solid var(--line);
   }
 
-  .playme-library {
+  .playme-list {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-  .bg-video-toggle,
-  .bg-video-next {
-    bottom: 12px;
-    width: 32px;
-    height: 32px;
-    font-size: 12px;
-  }
-  .bg-video-toggle {
-    right: 54px;
-  }
-  .bg-video-next {
-    right: 14px;
   }
 }
 
@@ -1166,7 +1224,7 @@ body {
   .contact-grid {
     grid-template-columns: 1fr;
   }
-  .playme-library {
+  .playme-list {
     grid-template-columns: repeat(2, 1fr);
   }
 }
