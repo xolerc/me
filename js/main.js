@@ -83,7 +83,10 @@ document.addEventListener('keydown', e => {
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-content').forEach(d => d.classList.toggle('active', d.id === 'tab-' + name));
-}
+  const titles = { home:'Home', projects:'Loyihalar', playme:'PlayMe', chat:'Chat', contact:'Aloqa', settings:'Sozlamalar' };
+  const titleEl = document.getElementById('topbarTitle');
+  if (titleEl) titleEl.textContent = titles[name] || name;
+} 
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));

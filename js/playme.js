@@ -334,6 +334,7 @@ function setState(newState) {
 async function playVideo(index) {
   debug('playVideo(' + index + ') videos=' + videos.length);
   if (index < 0 || index >= videos.length) return;
+  _playMeReady = true;
   currentIndex = index;
   const v = videos[index];
   if (!v) return;
@@ -813,7 +814,9 @@ function loadDefaultVideos() {
   }));
   buildShuffle();
   renderPlaylist();
-  playVideo(0);
+  if (document.getElementById('tab-playme')?.classList.contains('active')) {
+    playVideo(0);
+  }
 }
 
 // ===== Init =====
@@ -874,7 +877,7 @@ if (!localStorage.getItem('playme_v2')) {
 // Watch for PlayMe tab activation to start video loading
 const _tabObserver = new MutationObserver(() => {
   if (document.getElementById('tab-playme')?.classList.contains('active')) {
-    if (!_playMeReady && videos.length > 0 && !el.video.src) {
+    if (!_playMeReady && videos.length > 0) {
       playVideo(currentIndex);
     }
   }

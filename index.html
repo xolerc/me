@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
 
@@ -25,294 +25,306 @@
 
 <div class="app" style="opacity:0">
 
-  <!-- Tab Navigation -->
-  <nav>
-    <div class="nav-logo">XOLERIC <span>∞</span></div>
-    <button class="tab-btn active" data-tab="home">Home</button>
-    <button class="tab-btn" data-tab="projects">Loyihalar</button>
-    <button class="tab-btn" data-tab="chat">Chat</button>
-    <button class="tab-btn" data-tab="contact">Aloqa</button>
-    <button class="tab-btn" data-tab="playme">PlayMe</button>
-    <button class="tab-btn" data-tab="settings">Sozlamalar</button>
-  </nav>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">XOLERIC <span>∞</span></div>
+    <nav class="sidebar-nav">
+      <button class="tab-btn active" data-tab="home" title="Home">🏠<span>Home</span></button>
+      <button class="tab-btn" data-tab="projects" title="Loyihalar">📂<span>Loyihalar</span></button>
+      <button class="tab-btn" data-tab="playme" title="PlayMe">🎬<span>PlayMe</span></button>
+      <button class="tab-btn" data-tab="chat" title="Chat">💬<span>Chat</span></button>
+      <button class="tab-btn" data-tab="contact" title="Aloqa">📬<span>Aloqa</span></button>
+      <button class="tab-btn" data-tab="settings" title="Sozlamalar">⚙<span>Sozlamalar</span></button>
+    </nav>
+  </aside>
 
-  <!-- HOME TAB -->
-  <div class="tab-content active" id="tab-home">
-    <section class="page-section">
-      <div class="container">
-        <div class="hero-content">
-          <h1 class="hero-title"><span class="hero-glow">XOLERIC</span></h1>
-          <div class="hero-line"></div>
-          <p class="hero-sub">DASTURCHI &bull; DIZAYNER &bull; MUHANDIS</p>
-          <p class="hero-desc">Frontend arxitektori. Tizimlar quruvchi. Interfeyslar yaratuvchi.</p>
-          <div class="hero-btns">
-            <button class="btn" onclick="switchTab('projects')">Loyihalar</button>
-            <button class="btn btn-outline" onclick="switchTab('chat')">Chat</button>
-          </div>
-        </div>
+  <!-- CONTENT -->
+  <main class="content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title" id="topbarTitle">Home</span>
       </div>
-    </section>
-  </div>
-
-  <!-- PROJECTS TAB -->
-  <div class="tab-content" id="tab-projects">
-    <section class="page-section">
-      <div class="container">
-        <div class="page-header">
-          <span class="section-number">01</span>
-          <h2>Loyihalar</h2>
-          <p class="page-sub">GitHub'dagi barcha ochiq manbali loyihalar</p>
-        </div>
-        <div class="projects-loading" id="projectsLoading">Yuklanmoqda...</div>
-        <div class="projects-grid" id="projectsGrid"></div>
+      <div class="topbar-right">
+        <input type="text" class="topbar-search" id="globalSearch" placeholder="Qidirish..." />
       </div>
-    </section>
-  </div>
+    </header>
 
-  <!-- CHAT TAB -->
-  <div class="tab-content" id="tab-chat">
-    <section class="page-section chat-page">
-      <div class="container">
-        <div class="chat-container" id="chatContainer">
-          <div class="chat-sidebar" id="chatSidebar">
-            <div class="sidebar-header">
-              <h3>XOLERIC CHAT</h3>
-              <div class="sidebar-actions">
-                <button class="sidebar-create-btn" id="createChannelBtn" title="Kanal yaratish">📢</button>
-                <button class="sidebar-create-btn" id="createGroupBtn" title="Guruh yaratish">👥</button>
-                <button class="sidebar-create-btn" id="createPrivateBtn" title="Shaxsiy chat">💬</button>
-                <span class="online-badge" id="onlineBadge">0</span>
+    <section class="workspace">
+
+      <!-- HOME -->
+      <div class="tab-content active" id="tab-home">
+        <section class="page-section">
+          <div class="container">
+            <div class="hero-content">
+              <h1 class="hero-title"><span class="hero-glow">XOLERIC</span></h1>
+              <div class="hero-line"></div>
+              <p class="hero-sub">DASTURCHI &bull; DIZAYNER &bull; MUHANDIS</p>
+              <p class="hero-desc">Frontend arxitektori. Tizimlar quruvchi. Interfeyslar yaratuvchi.</p>
+              <div class="hero-btns">
+                <button class="btn" onclick="switchTab('projects')">Loyihalar</button>
+                <button class="btn btn-outline" onclick="switchTab('chat')">Chat</button>
               </div>
-            </div>
-            <div class="sidebar-user" id="sidebarUser">
-              <div class="sidebar-user-avatar" id="sidebarAvatar">?</div>
-              <div class="sidebar-user-info">
-                <span class="sidebar-user-name" id="sidebarName">Yuklanmoqda...</span>
-                <span class="sidebar-user-status" id="sidebarStatus">online</span>
-              </div>
-              <button class="sidebar-edit-btn" id="editProfileBtn">✎</button>
-            </div>
-            <div class="sidebar-chats" id="sidebarChats">
-              <div class="conv-empty">Yuklanmoqda...</div>
             </div>
           </div>
-          <div class="chat-main">
-            <div class="chat-header">
-              <span class="chat-header-name" id="chatHeaderName">Xoleric Chat</span>
-              <span class="chat-header-meta" id="chatHeaderMeta">super chat</span>
-              <span class="chat-header-count" id="onlineCount">0 online</span>
+        </section>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="tab-content" id="tab-projects">
+        <section class="page-section">
+          <div class="container">
+            <div class="page-header">
+              <span class="section-number">01</span>
+              <h2>Loyihalar</h2>
+              <p class="page-sub">GitHub'dagi barcha ochiq manbali loyihalar</p>
             </div>
-            <div id="chatJoinArea" style="display:none;padding:24px;text-align:center;"></div>
-            <div class="chat-messages" id="chatMessages">
-              <div class="chat-loading">Chatni boshlash uchun konversatsiyani tanlang</div>
-            </div>
-            <div class="chat-input-area" id="chatInputArea" style="display:none">
-              <label class="chat-media-btn" id="chatMediaBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                <input type="file" id="chatMediaInput" accept="image/*" hidden />
-              </label>
-              <div class="chat-preview" id="chatPreview" style="display:none">
-                <img id="chatPreviewImg" /><button id="chatPreviewRemove">&times;</button>
-              </div>
-              <textarea class="chat-input" id="chatInput" placeholder="Xabar yozing..." rows="1"></textarea>
-              <button class="chat-send-btn" id="chatSendBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-              </button>
-            </div>
+            <div class="projects-loading" id="projectsLoading">Yuklanmoqda...</div>
+            <div class="projects-grid" id="projectsGrid"></div>
           </div>
-        </div>
+        </section>
       </div>
-    </section>
-  </div>
 
-  <!-- Create Conversation Modal -->
-  <div class="modal-overlay" id="createModal" style="display:none">
-    <div class="modal">
-      <div class="modal-header"><h3 id="createModalTitle">Yangi chat</h3></div>
-      <div class="modal-body">
-        <input class="modal-input" id="createConvName" placeholder="Nomi" maxlength="50" />
-        <textarea class="modal-input modal-textarea" id="createConvDesc" placeholder="Tavsif (ixtiyoriy)" rows="2"></textarea>
-        <div id="createUserSelectWrap" style="display:none;margin-bottom:12px;">
-          <select class="modal-input" id="createConvUsers" style="border-radius:999px;padding:12px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#fff;font-family:inherit;font-size:14px;width:100%;outline:none;">
-            <option value="">Foydalanuvchini tanlang...</option>
-          </select>
-        </div>
-        <button class="modal-btn" id="createConvSave">Yaratish</button>
-        <button class="modal-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);margin-top:8px;" onclick="document.getElementById('createModal').style.display='none'">Bekor qilish</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CONTACT TAB -->
-  <div class="tab-content" id="tab-contact">
-    <section class="page-section">
-      <div class="container">
-        <div class="page-header">
-          <span class="section-number">02</span>
-          <h2>Aloqa</h2>
-          <p class="page-sub">Loyihalar va hamkorlik uchun</p>
-        </div>
-        <div class="contact-grid">
-          <a href="https://github.com/xolerc" target="_blank" class="contact-btn">GITHUB</a>
-          <a href="https://t.me/wxoleric" target="_blank" class="contact-btn">TELEGRAM</a>
-          <a href="https://youtube.com/@xoleric" target="_blank" class="contact-btn">YOUTUBE</a>
-          <a href="mailto:corexoleric@gmail.com" class="contact-btn">EMAIL</a>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- PLAYME TAB -->
-  <div class="tab-content" id="tab-playme">
-    <section class="page-section playme-page">
-      <div class="container">
-        <div class="page-header">
-          <h2>PlayMe</h2>
-          <p class="page-sub">Video pleer</p>
-        </div>
-        <div class="playme-main">
-          <div class="playme-player-wrap">
-            <video id="playmeVideo" class="playme-video" playsinline preload="auto"></video>
-            <!-- Loading -->
-            <div class="playme-loading" id="playmeLoading" style="display:none">
-              <div class="playme-loading-spinner"></div>
-            </div>
-            <!-- Error -->
-            <div class="playme-error" id="playmeError" style="display:none">
-              <span>⚠ Yuklanmadi</span>
-              <button class="playme-error-retry" id="playmeRetryBtn">Qayta urinish</button>
-            </div>
-            <!-- Controls -->
-            <div class="playme-controls" id="playmeControls">
-              <div class="playme-controls-top">
-                <div class="playme-video-info" id="playmeVideoInfo">
-                  <span class="playme-video-title" id="playmeVideoTitle">Video</span>
-                </div>
-              </div>
-              <div class="playme-controls-bottom">
-                <div class="playme-progress" id="playmeProgress">
-                  <div class="playme-progress-fill" id="playmeProgressFill"></div>
-                  <div class="playme-progress-thumb"></div>
-                </div>
-                <div class="playme-controls-row">
-                  <div class="playme-controls-left">
-                    <button class="playme-btn" id="playmePlayBtn" title="Play/Pause">▶</button>
-                    <button class="playme-btn" id="playmePrevBtn" title="Oldingi">⏮</button>
-                    <button class="playme-btn" id="playmeNextBtn" title="Keyingi">⏭</button>
-                    <span class="playme-time" id="playmeCurrent">0:00</span>
-                    <span class="playme-time-sep">/</span>
-                    <span class="playme-time" id="playmeDuration">0:00</span>
+      <!-- CHAT -->
+      <div class="tab-content" id="tab-chat">
+        <section class="page-section chat-page">
+          <div class="container">
+            <div class="chat-container" id="chatContainer">
+              <div class="chat-sidebar" id="chatSidebar">
+                <div class="sidebar-header">
+                  <h3>XOLERIC CHAT</h3>
+                  <div class="sidebar-actions">
+                    <button class="sidebar-create-btn" id="createChannelBtn" title="Kanal yaratish">📢</button>
+                    <button class="sidebar-create-btn" id="createGroupBtn" title="Guruh yaratish">👥</button>
+                    <button class="sidebar-create-btn" id="createPrivateBtn" title="Shaxsiy chat">💬</button>
+                    <span class="online-badge" id="onlineBadge">0</span>
                   </div>
-                  <div class="playme-controls-right">
-                    <button class="playme-btn playme-btn-shuffle" id="playmeShuffleBtn" title="Tasodifiy">🔀</button>
-                    <button class="playme-btn playme-btn-repeat" id="playmeRepeatBtn" title="Takrorlash">🔁</button>
-                    <button class="playme-btn playme-btn-speed" id="playmeSpeedBtn" title="Tezlik">1×</button>
-                    <button class="playme-btn playme-btn-pip" id="playmePipBtn" title="Picture in Picture">📍</button>
-                    <button class="playme-btn playme-btn-full" id="playmeFullBtn" title="To'liq ekran">⛶</button>
-                    <div class="playme-volume-wrap">
-                      <button class="playme-btn" id="playmeVolumeIcon" title="Ovoz">🔊</button>
-                      <input type="range" class="playme-volume" id="playmeVolume" min="0" max="1" step="0.05" value="0.5" />
+                </div>
+                <div class="sidebar-user" id="sidebarUser">
+                  <div class="sidebar-user-avatar" id="sidebarAvatar">?</div>
+                  <div class="sidebar-user-info">
+                    <span class="sidebar-user-name" id="sidebarName">Yuklanmoqda...</span>
+                    <span class="sidebar-user-status" id="sidebarStatus">online</span>
+                  </div>
+                  <button class="sidebar-edit-btn" id="editProfileBtn">✎</button>
+                </div>
+                <div class="sidebar-chats" id="sidebarChats">
+                  <div class="conv-empty">Yuklanmoqda...</div>
+                </div>
+              </div>
+              <div class="chat-main">
+                <div class="chat-header">
+                  <span class="chat-header-name" id="chatHeaderName">Xoleric Chat</span>
+                  <span class="chat-header-meta" id="chatHeaderMeta">super chat</span>
+                  <span class="chat-header-count" id="onlineCount">0 online</span>
+                </div>
+                <div id="chatJoinArea" style="display:none;padding:24px;text-align:center;"></div>
+                <div class="chat-messages" id="chatMessages">
+                  <div class="chat-loading">Chatni boshlash uchun konversatsiyani tanlang</div>
+                </div>
+                <div class="chat-input-area" id="chatInputArea" style="display:none">
+                  <label class="chat-media-btn" id="chatMediaBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    <input type="file" id="chatMediaInput" accept="image/*" hidden />
+                  </label>
+                  <div class="chat-preview" id="chatPreview" style="display:none">
+                    <img id="chatPreviewImg" /><button id="chatPreviewRemove">&times;</button>
+                  </div>
+                  <textarea class="chat-input" id="chatInput" placeholder="Xabar yozing..." rows="1"></textarea>
+                  <button class="chat-send-btn" id="chatSendBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Create Conversation Modal -->
+      <div class="modal-overlay" id="createModal" style="display:none">
+        <div class="modal">
+          <div class="modal-header"><h3 id="createModalTitle">Yangi chat</h3></div>
+          <div class="modal-body">
+            <input class="modal-input" id="createConvName" placeholder="Nomi" maxlength="50" />
+            <textarea class="modal-input modal-textarea" id="createConvDesc" placeholder="Tavsif (ixtiyoriy)" rows="2"></textarea>
+            <div id="createUserSelectWrap" style="display:none;margin-bottom:12px;">
+              <select class="modal-input" id="createConvUsers" style="border-radius:999px;padding:12px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#fff;font-family:inherit;font-size:14px;width:100%;outline:none;">
+                <option value="">Foydalanuvchini tanlang...</option>
+              </select>
+            </div>
+            <button class="modal-btn" id="createConvSave">Yaratish</button>
+            <button class="modal-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.06);margin-top:8px;" onclick="document.getElementById('createModal').style.display='none'">Bekor qilish</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="tab-content" id="tab-contact">
+        <section class="page-section">
+          <div class="container">
+            <div class="page-header">
+              <span class="section-number">02</span>
+              <h2>Aloqa</h2>
+              <p class="page-sub">Loyihalar va hamkorlik uchun</p>
+            </div>
+            <div class="contact-grid">
+              <a href="https://github.com/xolerc" target="_blank" class="contact-btn">GITHUB</a>
+              <a href="https://t.me/wxoleric" target="_blank" class="contact-btn">TELEGRAM</a>
+              <a href="https://youtube.com/@xoleric" target="_blank" class="contact-btn">YOUTUBE</a>
+              <a href="mailto:corexoleric@gmail.com" class="contact-btn">EMAIL</a>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- PLAYME -->
+      <div class="tab-content" id="tab-playme">
+        <section class="page-section playme-page">
+          <div class="container">
+            <div class="page-header">
+              <h2>PlayMe</h2>
+              <p class="page-sub">Video pleer</p>
+            </div>
+            <div class="playme-main">
+              <div class="playme-player-wrap">
+                <video id="playmeVideo" class="playme-video" playsinline preload="auto"></video>
+                <div class="playme-loading" id="playmeLoading" style="display:none">
+                  <div class="playme-loading-spinner"></div>
+                </div>
+                <div class="playme-error" id="playmeError" style="display:none">
+                  <span>⚠ Yuklanmadi</span>
+                  <button class="playme-error-retry" id="playmeRetryBtn">Qayta urinish</button>
+                </div>
+                <div class="playme-controls" id="playmeControls">
+                  <div class="playme-controls-top">
+                    <div class="playme-video-info" id="playmeVideoInfo">
+                      <span class="playme-video-title" id="playmeVideoTitle">Video</span>
+                    </div>
+                  </div>
+                  <div class="playme-controls-bottom">
+                    <div class="playme-progress" id="playmeProgress">
+                      <div class="playme-progress-fill" id="playmeProgressFill"></div>
+                      <div class="playme-progress-thumb"></div>
+                    </div>
+                    <div class="playme-controls-row">
+                      <div class="playme-controls-left">
+                        <button class="playme-btn" id="playmePlayBtn" title="Play/Pause">▶</button>
+                        <button class="playme-btn" id="playmePrevBtn" title="Oldingi">⏮</button>
+                        <button class="playme-btn" id="playmeNextBtn" title="Keyingi">⏭</button>
+                        <span class="playme-time" id="playmeCurrent">0:00</span>
+                        <span class="playme-time-sep">/</span>
+                        <span class="playme-time" id="playmeDuration">0:00</span>
+                      </div>
+                      <div class="playme-controls-right">
+                        <button class="playme-btn playme-btn-shuffle" id="playmeShuffleBtn" title="Tasodifiy">🔀</button>
+                        <button class="playme-btn playme-btn-repeat" id="playmeRepeatBtn" title="Takrorlash">🔁</button>
+                        <button class="playme-btn playme-btn-speed" id="playmeSpeedBtn" title="Tezlik">1×</button>
+                        <button class="playme-btn playme-btn-pip" id="playmePipBtn" title="Picture in Picture">📍</button>
+                        <button class="playme-btn playme-btn-full" id="playmeFullBtn" title="To'liq ekran">⛶</button>
+                        <div class="playme-volume-wrap">
+                          <button class="playme-btn" id="playmeVolumeIcon" title="Ovoz">🔊</button>
+                          <input type="range" class="playme-volume" id="playmeVolume" min="0" max="1" step="0.05" value="0.5" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <div class="playme-search-wrap" id="playmeSearchWrap" style="display:none">
+                <input type="text" class="playme-search" id="playmeSearch" placeholder="Qidirish..." />
+                <span class="playme-count" id="playmeCount">0 video</span>
+              </div>
+              <div class="playme-dropzone" id="playmeDropZone">
+                <input type="file" id="playmeFileInput" accept="video/*" multiple hidden />
+                <div class="playme-drop-icon">🎬</div>
+                <div class="playme-drop-text">Video fayllarni tashlang yoki tanlang</div>
+                <div class="playme-drop-sub">MP4, WebM, MOV va boshqa formatlar</div>
+              </div>
+              <div class="playme-empty" id="playmeEmpty">
+                <div class="playme-empty-icon">🎥</div>
+                <div class="playme-empty-text">Hali videolar yo'q</div>
+                <div class="playme-empty-sub">Yuqoridagi maydonga video fayllarni tashlang yoki tanlang</div>
+              </div>
+              <div class="playme-list" id="playmeList"></div>
             </div>
           </div>
-          <!-- Search -->
-          <div class="playme-search-wrap" id="playmeSearchWrap" style="display:none">
-            <input type="text" class="playme-search" id="playmeSearch" placeholder="Qidirish..." />
-            <span class="playme-count" id="playmeCount">0 video</span>
-          </div>
-          <!-- Drop Zone -->
-          <div class="playme-dropzone" id="playmeDropZone">
-            <input type="file" id="playmeFileInput" accept="video/*" multiple hidden />
-            <div class="playme-drop-icon">🎬</div>
-            <div class="playme-drop-text">Video fayllarni tashlang yoki tanlang</div>
-            <div class="playme-drop-sub">MP4, WebM, MOV va boshqa formatlar</div>
-          </div>
-          <!-- Empty State -->
-          <div class="playme-empty" id="playmeEmpty">
-            <div class="playme-empty-icon">🎥</div>
-            <div class="playme-empty-text">Hali videolar yo'q</div>
-            <div class="playme-empty-sub">Yuqoridagi maydonga video fayllarni tashlang yoki tanlang</div>
-          </div>
-          <!-- Playlist -->
-          <div class="playme-list" id="playmeList"></div>
-        </div>
+        </section>
       </div>
+
+      <!-- SETTINGS -->
+      <div class="tab-content" id="tab-settings">
+        <section class="page-section">
+          <div class="container">
+            <div class="page-header" style="margin-bottom:32px;">
+              <span class="section-number">04</span>
+              <h2>Sozlamalar</h2>
+              <p class="page-sub">Ilova sozlamalari va yuklamalar</p>
+            </div>
+            <div class="settings-card">
+              <h3>⬇ XOLERIC APK</h3>
+              <p>Android qurilmangizga XOLERIC ilovasini yuklab oling. Chat, musiqa, video va sozlamalar bilan to'liq tajriba.</p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <a href="https://github.com/xolerc/xoleric-apk/releases/latest/download/XOLERIC.apk" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;">⬇ XOLERIC APK v1.0</a>
+                <a href="xoleric.apk" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;">⬇ Eski versiya</a>
+              </div>
+            </div>
+            <div class="settings-card">
+              <h3>⚙ Tema</h3>
+              <p>Sayt ko'rinishini o'zgartirish</p>
+              <div class="theme-grid">
+                <button class="theme-btn active" data-theme="dark">🌑 Tungi</button>
+                <button class="theme-btn" data-theme="light">☀️ Kunduzgi</button>
+                <button class="theme-btn" data-theme="matrix">🌐 Matrix</button>
+                <button class="theme-btn" data-theme="cyber">⚡ Cyber</button>
+                <button class="theme-btn" data-theme="neon">💡 Neon</button>
+                <button class="theme-btn" data-theme="minimal">▣ Minimal</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
     </section>
-  </div>
+  </main>
 
-  <!-- SETTINGS TAB -->
-  <div class="tab-content" id="tab-settings">
-    <section class="page-section">
-      <div class="container">
-        <div class="page-header" style="margin-bottom:32px;">
-          <span class="section-number">04</span>
-          <h2>Sozlamalar</h2>
-          <p class="page-sub">Ilova sozlamalari va yuklamalar</p>
-        </div>
-        <div class="settings-card">
-          <h3>⬇ XOLERIC APK</h3>
-          <p>Android qurilmangizga XOLERIC ilovasini yuklab oling. Chat, musiqa, video va sozlamalar bilan to'liq tajriba.</p>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <a href="https://github.com/xolerc/xoleric-apk/releases/latest/download/XOLERIC.apk" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:8px;">⬇ XOLERIC APK v1.0</a>
-            <a href="xoleric.apk" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:8px;">⬇ Eski versiya</a>
-          </div>
-        </div>
-        <div class="settings-card">
-          <h3>⚙ Tema</h3>
-          <p>Sayt ko'rinishini o'zgartirish</p>
-          <div class="theme-grid">
-            <button class="theme-btn active" data-theme="dark">🌑 Tungi</button>
-            <button class="theme-btn" data-theme="light">☀️ Kunduzgi</button>
-            <button class="theme-btn" data-theme="matrix">🌐 Matrix</button>
-            <button class="theme-btn" data-theme="cyber">⚡ Cyber</button>
-            <button class="theme-btn" data-theme="neon">💡 Neon</button>
-            <button class="theme-btn" data-theme="minimal">▣ Minimal</button>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Floating Mini Player -->
-  <div class="float-player" id="floatPlayer">
-    <div class="float-player-header">
-      <span class="float-player-title" id="floatTitle">PlayMe</span>
-      <button class="float-player-close" id="floatClose">✕</button>
-    </div>
-    <video id="floatVideo" class="float-video" loop playsinline></video>
-  </div>
-
-  <!-- Setup Modal -->
-  <div class="modal-overlay" id="setupModal">
-    <div class="modal">
-      <div class="modal-header"><h3>Xush kelibsiz!</h3></div>
-      <div class="modal-body">
-        <p style="color:rgba(255,255,255,0.4);margin-bottom:20px;font-size:14px;font-weight:300;">Chatda qatnashish uchun profilingizni yarating</p>
-        <div class="setup-avatar" id="setupAvatar">?</div>
-        <label class="setup-avatar-label">Rasm yuklash<input type="file" accept="image/*" hidden id="setupAvatarInput" /></label>
-        <input class="modal-input" id="setupName" placeholder="Username" maxlength="30" />
-        <textarea class="modal-input modal-textarea" id="setupBio" placeholder="Bio (ixtiyoriy)" maxlength="150" rows="2"></textarea>
-        <button class="modal-btn" id="setupSave">Boshlash</button>
-      </div>
-    </div>
-  </div>
-
-  <audio id="bgMusic" src="bg-music.mp3" loop></audio>
-  <button id="musicToggle" class="music-btn" aria-label="Musiqa">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-  </button>
-
-  <footer class="footer"><p>XOLERIC &copy; 2026</p></footer>
-
-  <script src="js/main.js?v=7"></script>
-  <script src="js/db.js?v=7"></script>
-  <script src="js/chat.js?v=7"></script>
-  <script src="js/repos.js?v=7"></script>
-  <script src="js/playme.js?v=7"></script>
-  <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </div>
+
+<!-- Floating Mini Player -->
+<div class="float-player" id="floatPlayer">
+  <div class="float-player-header">
+    <span class="float-player-title" id="floatTitle">PlayMe</span>
+    <button class="float-player-close" id="floatClose">✕</button>
+  </div>
+  <video id="floatVideo" class="float-video" loop playsinline></video>
+</div>
+
+<!-- Setup Modal -->
+<div class="modal-overlay" id="setupModal">
+  <div class="modal">
+    <div class="modal-header"><h3>Xush kelibsiz!</h3></div>
+    <div class="modal-body">
+      <p style="color:rgba(255,255,255,0.4);margin-bottom:20px;font-size:14px;font-weight:300;">Chatda qatnashish uchun profilingizni yarating</p>
+      <div class="setup-avatar" id="setupAvatar">?</div>
+      <label class="setup-avatar-label">Rasm yuklash<input type="file" accept="image/*" hidden id="setupAvatarInput" /></label>
+      <input class="modal-input" id="setupName" placeholder="Username" maxlength="30" />
+      <textarea class="modal-input modal-textarea" id="setupBio" placeholder="Bio (ixtiyoriy)" maxlength="150" rows="2"></textarea>
+      <button class="modal-btn" id="setupSave">Boshlash</button>
+    </div>
+  </div>
+</div>
+
+<audio id="bgMusic" src="bg-music.mp3" loop></audio>
+<button id="musicToggle" class="music-btn" aria-label="Musiqa">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+</button>
+
+<footer class="footer"><p>XOLERIC &copy; 2026</p></footer>
+
+<script src="js/main.js?v=8"></script>
+<script src="js/db.js?v=8"></script>
+<script src="js/chat.js?v=8"></script>
+<script src="js/repos.js?v=8"></script>
+<script src="js/playme.js?v=8"></script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>
