@@ -11,6 +11,11 @@
 </head>
 <body>
 
+<video id="bgVideo" class="bg-video" muted playsinline></video>
+<div class="bg-overlay"></div>
+<button class="bg-video-toggle" id="bgVideoToggle" title="Ovoz">🔇</button>
+<button class="bg-video-next" id="bgVideoNext" title="Keyingi">→</button>
+
 <div class="app">
 
   <aside class="sidebar">
@@ -30,6 +35,8 @@
     <header class="topbar">XOLERIC <span>∞</span></header>
 
     <section class="workspace">
+
+      <div class="workspace-content">
 
       <!-- HOME / Workspace -->
       <div class="tab-content active" id="tab-home">
@@ -144,63 +151,10 @@
       <div class="tab-content" id="tab-playme">
         <div class="page-header">
           <h2 class="page-title">Interface</h2>
-          <p class="page-sub">Video pleer</p>
+          <p class="page-sub">Orqa fon videolari</p>
         </div>
-        <div class="playme-main">
-          <div class="card playme-player-wrap">
-            <video id="playmeVideo" class="playme-video" playsinline preload="auto"></video>
-            <div class="playme-loading" id="playmeLoading" style="display:none">
-              <div class="playme-loading-spinner"></div>
-            </div>
-            <div class="playme-error" id="playmeError" style="display:none">
-              <span>⚠ Yuklanmadi</span>
-              <button class="playme-error-retry" id="playmeRetryBtn">Qayta urinish</button>
-            </div>
-            <div class="playme-controls" id="playmeControls">
-              <div class="playme-controls-top">
-                <div class="playme-video-info" id="playmeVideoInfo">
-                  <span class="playme-video-title" id="playmeVideoTitle">Video</span>
-                </div>
-              </div>
-              <div class="playme-controls-bottom">
-                <div class="playme-progress" id="playmeProgress">
-                  <div class="playme-progress-fill" id="playmeProgressFill"></div>
-                </div>
-                <div class="playme-controls-row">
-                  <div class="playme-controls-left">
-                    <button class="playme-btn" id="playmePlayBtn" title="Play/Pause">▶</button>
-                    <button class="playme-btn" id="playmePrevBtn" title="Oldingi">⏮</button>
-                    <button class="playme-btn" id="playmeNextBtn" title="Keyingi">⏭</button>
-                    <span class="playme-time" id="playmeCurrent">0:00</span>
-                    <span class="playme-time-sep">/</span>
-                    <span class="playme-time" id="playmeDuration">0:00</span>
-                  </div>
-                  <div class="playme-controls-right">
-                    <button class="playme-btn playme-btn-shuffle" id="playmeShuffleBtn" title="Tasodifiy">🔀</button>
-                    <button class="playme-btn playme-btn-repeat" id="playmeRepeatBtn" title="Takrorlash">🔁</button>
-                    <button class="playme-btn playme-btn-speed" id="playmeSpeedBtn" title="Tezlik">1×</button>
-                    <button class="playme-btn playme-btn-pip" id="playmePipBtn" title="Picture in Picture">📍</button>
-                    <button class="playme-btn playme-btn-full" id="playmeFullBtn" title="To'liq ekran">⛶</button>
-                    <div class="playme-volume-wrap">
-                      <button class="playme-btn" id="playmeVolumeIcon" title="Ovoz">🔊</button>
-                      <input type="range" class="playme-volume" id="playmeVolume" min="0" max="1" step="0.05" value="0.5" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="playme-search-wrap" id="playmeSearchWrap" style="display:none">
-            <input type="text" class="playme-search" id="playmeSearch" placeholder="Qidirish..." />
-            <span class="playme-count" id="playmeCount">0 video</span>
-          </div>
-          <div class="card playme-dropzone" id="playmeDropZone">
-            <input type="file" id="playmeFileInput" accept="video/*" multiple hidden />
-            <div class="playme-drop-text">Video fayllarni tashlang yoki tanlang</div>
-            <div class="playme-drop-sub">MP4, WebM, MOV</div>
-          </div>
-          <div class="playme-list" id="playmeList"></div>
-        </div>
+        <p class="playme-hint">Videolar ish maydoni orqa fonida avtomatik o'ynaydi</p>
+        <div class="playme-library" id="playmeLibrary"></div>
       </div>
 
       <!-- SETTINGS -->
@@ -232,6 +186,7 @@
         </div>
       </div>
 
+    </div><!-- /workspace-content -->
     </section>
   </main>
 
