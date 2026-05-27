@@ -70,7 +70,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'PrintScreen' || e.key === 'F12') e.preventDefault();
 });
 
-const TABS = ['home','projects','chat','playme','contact','settings'];
+const TABS = ['home','projects','playme','chat','contact','settings'];
 const TAB_NAMES = { home:'Ish maydoni', projects:'Loyihalar', playme:'Pleer', chat:'Chat', contact:'Aloqa', settings:'Sozlamalar' };
 
 let currentTab = 0;
