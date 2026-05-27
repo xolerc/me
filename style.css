@@ -1848,4 +1848,9 @@ nav {
   .float-player { width: 200px; bottom: 70px; right: 12px; }
   .playme-volume-wrap .playme-volume { width: 40px; opacity: 1; }
   .playme-btn { width: 28px; height: 28px; font-size: 12px; }
+  /* Always show controls on mobile when paused */
+  .playme-video[data-state="paused"] ~ .playme-controls .playme-controls-bottom,
+  .playme-video[data-state="idle"] ~ .playme-controls .playme-controls-bottom {
+    opacity: 1 !important;
+  }
 }

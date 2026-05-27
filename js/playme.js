@@ -1,8 +1,6 @@
 // ===== PlayMe v2 — Video Player =====
 
-const VIDEOS_PATH = location.hostname === 'xolerc.github.io' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
-  ? 'videos'
-  : 'https://raw.githubusercontent.com/xolerc/me/main/videos';
+const VIDEOS_PATH = 'https://xolerc.github.io/me/videos';
 
 const DEFAULT_VIDEOS = [
   { file: VIDEOS_PATH + '/2_5211184992486459614.mp4', title: 'Video 1' },
@@ -18,6 +16,17 @@ const DEFAULT_VIDEOS = [
   { file: VIDEOS_PATH + '/2_5458751034891467056.mp4', title: 'Video 11' },
   { file: VIDEOS_PATH + '/2_5462948497839910298.mp4', title: 'Video 12' },
 ];
+
+// Debug: show video URLs on page
+const debugEl = document.createElement('div');
+debugEl.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0f0;padding:8px;font-size:11px;z-index:9999;font-family:monospace;border-top:2px solid #0f0;max-height:80px;overflow:auto';
+document.body.appendChild(debugEl);
+function debug(msg) {
+  debugEl.textContent = typeof msg === 'string' ? msg : JSON.stringify(msg);
+  console.log('[PlayMe]', msg);
+}
+
+debug('Script loaded');
 
 // ===== State =====
 const STATE = {
@@ -323,11 +332,13 @@ function setState(newState) {
 }
 
 async function playVideo(index) {
+  debug('playVideo(' + index + ') videos=' + videos.length);
   if (index < 0 || index >= videos.length) return;
   currentIndex = index;
   const v = videos[index];
   if (!v) return;
 
+  debug('Loading: ' + v.file);
   setState(STATE.LOADING);
   el.video.src = v.file;
   el.video.load();
@@ -344,16 +355,21 @@ function startLoadTimer() {
   clearTimeout(loadTimer);
   loadTimer = setTimeout(() => {
     if (state === STATE.LOADING) {
+      debug('Load timeout: switching to error');
       setState(STATE.ERROR);
     }
-  }, 15000);
+  }, 30000);
 }
 function clearLoadTimer() {
   clearTimeout(loadTimer);
 }
 
-el.video.addEventListener('loadstart', startLoadTimer);
+el.video.addEventListener('loadstart', () => {
+  debug('loadstart');
+  startLoadTimer();
+});
 el.video.addEventListener('loadedmetadata', () => {
+  debug('loadedmetadata duration=' + el.video.duration);
   clearLoadTimer();
   videos[currentIndex]._duration = el.video.duration;
   const saved = getSavedPosition(currentIndex);
@@ -374,7 +390,11 @@ el.video.addEventListener('play', () => {
   showFloatPlayer();
 });
 el.video.addEventListener('pause', () => setState(STATE.PAUSED));
-el.video.addEventListener('error', () => setState(STATE.ERROR));
+el.video.addEventListener('error', () => {
+  const err = el.video.error;
+  debug('video error: code=' + err?.code + ' message=' + (err?.message || ''));
+  setState(STATE.ERROR);
+});
 
 el.video.addEventListener('timeupdate', () => {
   const v = el.video;
@@ -797,10 +817,26 @@ function loadDefaultVideos() {
 }
 
 // ===== Init =====
+let _playMeReady = false;
+
+function playMePlay() {
+  if (_playMeReady) return;
+  _playMeReady = true;
+  if (videos.length > 0) playVideo(currentIndex);
+}
+
+// Clear IndexedDB on first visit (remove stale data from v1)
+if (!localStorage.getItem('playme_v2')) {
+  try { indexedDB.deleteDatabase('PlayMeDB'); } catch {}
+  localStorage.setItem('playme_v2', '1');
+}
+
 (async function initPlayMe() {
+  debug('initPlayMe start');
   try {
     loadSettings();
     const entries = await dbLoadAll();
+    debug('dbLoadAll entries=' + entries.length);
     if (entries.length > 0) {
       revokeAll();
       videos = [];
@@ -818,23 +854,30 @@ function loadDefaultVideos() {
         });
       }
       renderPlaylist();
-      if (videos.length > 0) playVideo(0);
+      if (videos.length > 0) {
+        if (document.getElementById('tab-playme')?.classList.contains('active')) {
+          playVideo(0);
+        }
+      }
       return;
     }
-  } catch {}
+  } catch (err) {
+    debug('initPlayMe error: ' + (err?.message || err));
+  }
+  debug('initPlayMe: loadDefaultVideos');
   loadDefaultVideos();
+  if (document.getElementById('tab-playme')?.classList.contains('active')) {
+    playVideo(0);
+  }
 })();
 
-// Global error display
-window.addEventListener('error', e => {
-  const d = document.createElement('div');
-  d.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#ff000033;color:#fff;padding:12px;font-size:12px;z-index:9999;font-family:monospace;border-top:1px solid #ff000066';
-  d.textContent = 'JS Error: ' + (e.message || e.error?.message || 'unknown');
-  document.body.appendChild(d);
+// Watch for PlayMe tab activation to start video loading
+const _tabObserver = new MutationObserver(() => {
+  if (document.getElementById('tab-playme')?.classList.contains('active')) {
+    if (!_playMeReady && videos.length > 0 && !el.video.src) {
+      playVideo(currentIndex);
+    }
+  }
 });
-window.addEventListener('unhandledrejection', e => {
-  const d = document.createElement('div');
-  d.style.cssText = 'position:fixed;bottom:40px;left:0;right:0;background:#ff660033;color:#fff;padding:12px;font-size:12px;z-index:9999;font-family:monospace;border-top:1px solid #ff660066';
-  d.textContent = 'Promise Error: ' + (e.reason?.message || e.reason || 'unknown');
-  document.body.appendChild(d);
-});
+const _playmeTab = document.getElementById('tab-playme');
+if (_playmeTab) _tabObserver.observe(_playmeTab, { attributes: true, attributeFilter: ['class'] });
