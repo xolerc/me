@@ -42,21 +42,21 @@ body {
 
 /* ===== SIDEBAR ===== */
 .sidebar {
-  background: var(--surface);
+  background: rgba(255,255,255,0.01);
   border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  padding: 20px 12px;
-  gap: 24px;
+  padding: 20px 10px;
+  gap: 20px;
   overflow-y: auto;
   position: relative;
 }
 
 .logo {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 3px;
-  padding: 4px 12px;
+  padding: 4px 14px;
   color: var(--text);
 }
 .logo span {
@@ -66,68 +66,91 @@ body {
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .nav-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 12px;
+  padding: 14px 16px;
   border: none;
   border-radius: var(--radius);
-  background: transparent;
+  background: rgba(255,255,255,0.03);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.25s ease;
   text-align: left;
   width: 100%;
   position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+
+.nav-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 20%, rgba(77,124,255,0.08), transparent 80%);
+  transform: translateX(-120%);
+  transition: transform 0.8s ease;
+  pointer-events: none;
+}
+
+.nav-btn:hover .nav-glow {
+  transform: translateX(120%);
 }
 
 .nav-btn::before {
   content: '';
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
-  opacity: 0.4;
-  transition: opacity 0.15s;
+  opacity: 0.5;
+  transition: opacity 0.25s;
+  position: relative;
+  z-index: 1;
 }
 
 .nav-btn:hover {
-  background: var(--surface-hover);
+  background: rgba(255,255,255,0.06);
   color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25), 0 0 12px rgba(77,124,255,0.08);
 }
 .nav-btn:hover::before {
-  opacity: 0.7;
+  opacity: 0.8;
+}
+
+.nav-btn:active {
+  transform: scale(0.97);
 }
 
 .nav-btn.active {
-  background: var(--accent-dim);
+  background: rgba(77,124,255,0.12);
   color: var(--accent);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.06), 0 4px 20px rgba(77,124,255,0.1);
 }
 .nav-btn.active::before {
   opacity: 1;
 }
 
-/* ::before icons */
+/* nav icons via ::before */
 .nav-btn[data-tab="home"]::before {
   background: var(--accent);
-  box-shadow:
-    6px 0 0 var(--accent),
-    0 6px 0 var(--accent),
-    6px 6px 0 var(--accent);
+  box-shadow: 7px 0 0 var(--accent), 0 7px 0 var(--accent), 7px 7px 0 var(--accent);
   border-radius: 1px;
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
 }
 
 .nav-btn[data-tab="projects"]::before {
-  width: 14px;
-  height: 12px;
+  width: 16px;
+  height: 14px;
   border: 2px solid var(--accent);
   border-radius: 3px;
   background: transparent;
@@ -138,15 +161,15 @@ body {
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 7px 0 7px 12px;
+  border-width: 8px 0 8px 14px;
   border-color: transparent transparent transparent var(--accent);
   background: none;
-  margin-left: 2px;
+  margin-left: 3px;
 }
 
 .nav-btn[data-tab="chat"]::before {
-  width: 14px;
-  height: 11px;
+  width: 16px;
+  height: 12px;
   border: 2px solid var(--accent);
   border-radius: 4px;
   background: transparent;
@@ -155,16 +178,17 @@ body {
 .nav-btn[data-tab="chat"]::after {
   content: '';
   position: absolute;
-  left: 11px;
-  top: 8px;
+  left: 13px;
+  top: 9px;
   border-style: solid;
   border-width: 4px 5px 0 0;
   border-color: var(--accent) transparent transparent transparent;
+  z-index: 1;
 }
 
 .nav-btn[data-tab="contact"]::before {
-  width: 14px;
-  height: 10px;
+  width: 16px;
+  height: 11px;
   border: 2px solid var(--accent);
   border-radius: 2px;
   background: transparent;
@@ -173,16 +197,17 @@ body {
 .nav-btn[data-tab="contact"]::after {
   content: '';
   position: absolute;
-  left: 1px;
-  top: 4px;
-  width: 10px;
-  height: 8px;
+  left: 2px;
+  top: 5px;
+  width: 11px;
+  height: 9px;
   background: linear-gradient(135deg, transparent 40%, var(--accent) 40%, var(--accent) 60%, transparent 60%);
+  z-index: 1;
 }
 
 .nav-btn[data-tab="settings"]::before {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border: 2px solid var(--accent);
   border-radius: 50%;
   background: transparent;
@@ -191,15 +216,15 @@ body {
 .nav-btn[data-tab="settings"]::after {
   content: '';
   position: absolute;
-  left: 3px;
-  top: 3px;
-  width: 6px;
-  height: 6px;
+  left: 4px;
+  top: 4px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--accent);
+  z-index: 1;
 }
 
-/* ::after fix - only show for buttons that use it */
 .nav-btn {
   position: relative;
 }
@@ -353,33 +378,61 @@ body {
   gap: 10px;
 }
 
-/* ===== BUTTONS ===== */
-.btn {
+/* ===== GLASS BUTTONS ===== */
+.glass-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 24px;
-  border: none;
+  padding: 12px 28px;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 999px;
-  background: var(--accent-dim);
-  color: var(--accent);
-  font-size: 13px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+  backdrop-filter: blur(18px);
+  color: rgba(255,255,255,0.8);
+  font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.08), 0 10px 30px rgba(0,0,0,0.3);
 }
-.btn:hover {
-  background: rgba(77,124,255,0.18);
-  transform: translateY(-1px);
+
+.glass-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.12), transparent 80%);
+  transform: translateX(-120%);
+  transition: transform 0.8s ease;
+  pointer-events: none;
 }
-.btn-outline {
+
+.glass-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05));
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.12), 0 16px 40px rgba(0,0,0,0.4), 0 0 20px rgba(77,124,255,0.12);
+  color: #fff;
+}
+
+.glass-btn:hover::before {
+  transform: translateX(120%);
+}
+
+.glass-btn:active {
+  transform: scale(0.96);
+}
+
+.glass-outline {
   background: transparent;
-  border: 1px solid var(--line-hover);
+  backdrop-filter: none;
+  box-shadow: none;
 }
-.btn-outline:hover {
-  border-color: rgba(77,124,255,0.3);
+.glass-outline:hover {
+  background: rgba(255,255,255,0.04);
 }
 
 /* ===== PROJECTS ===== */
@@ -397,14 +450,16 @@ body {
 .project-card {
   padding: 20px;
   border-radius: var(--radius);
-  background: var(--surface);
+  background: rgba(255,255,255,0.02);
   border: 1px solid var(--line);
-  transition: all 0.2s;
+  transition: all 0.35s ease;
   text-decoration: none;
   color: inherit;
   display: block;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
 }
 .project-card::before {
   content: '';
@@ -413,10 +468,24 @@ body {
   background: radial-gradient(circle at top right, rgba(77,124,255,0.06), transparent 50%);
   pointer-events: none;
 }
+.project-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 20%, rgba(77,124,255,0.06), transparent 80%);
+  transform: translateX(-120%);
+  transition: transform 0.8s ease;
+  pointer-events: none;
+}
 .project-card:hover {
-  background: var(--surface-hover);
+  background: rgba(255,255,255,0.04);
   border-color: var(--line-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2), 0 0 16px rgba(77,124,255,0.06);
+}
+.project-card:hover::after {
+  transform: translateX(120%);
 }
 .project-card h3 {
   font-size: 15px;
@@ -877,20 +946,38 @@ body {
   justify-content: center;
   padding: 22px;
   border-radius: var(--radius);
-  background: var(--surface);
+  background: rgba(255,255,255,0.02);
   border: 1px solid var(--line);
   text-decoration: none;
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 2px;
-  transition: all 0.2s;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+.contact-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 20%, rgba(77,124,255,0.06), transparent 80%);
+  transform: translateX(-120%);
+  transition: transform 0.8s ease;
+  pointer-events: none;
 }
 .contact-btn:hover {
-  background: var(--surface-hover);
+  background: rgba(255,255,255,0.04);
   border-color: var(--line-hover);
   color: var(--accent);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+}
+.contact-btn:hover::before {
+  transform: translateX(120%);
 }
 
 /* ===== PLAYME ===== */
@@ -1154,10 +1241,10 @@ body {
   }
 
   .nav-btn {
-    min-width: 120px;
+    min-width: 130px;
     flex: none;
-    padding: 8px 14px;
-    font-size: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
   }
 
   .content {
@@ -1211,9 +1298,9 @@ body {
     gap: 4px;
   }
   .nav-btn {
-    padding: 6px 12px;
-    font-size: 11px;
-    min-width: 100px;
+    padding: 8px 14px;
+    font-size: 12px;
+    min-width: 110px;
   }
   .workspace {
     padding: 12px;
