@@ -1,20 +1,24 @@
 // ===== PlayMe v2 — Video Player =====
 
 const VIDEOS_PATH = 'https://xolerc.github.io/me/videos';
+const VIDEOS_WEBM_PATH = 'https://xolerc.github.io/me/videos_webm';
+
+// Detect Firefox (which may lack h264 support via system FFmpeg)
+const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
 const DEFAULT_VIDEOS = [
-  { file: VIDEOS_PATH + '/2_5211184992486459614.mp4', title: 'Video 1' },
-  { file: VIDEOS_PATH + '/2_5235775282278869717.mp4', title: 'Video 2' },
-  { file: VIDEOS_PATH + '/2_5237973231792597901.mp4', title: 'Video 3' },
-  { file: VIDEOS_PATH + '/2_5282749129141818157.mp4', title: 'Video 4' },
-  { file: VIDEOS_PATH + '/2_5287781263149656497.mp4', title: 'Video 5' },
-  { file: VIDEOS_PATH + '/2_5373350012551988338.mp4', title: 'Video 6' },
-  { file: VIDEOS_PATH + '/2_5447322629427989855.mp4', title: 'Video 7' },
-  { file: VIDEOS_PATH + '/2_5452074624193953955.mp4', title: 'Video 8' },
-  { file: VIDEOS_PATH + '/2_5458622658318987050.mp4', title: 'Video 9' },
-  { file: VIDEOS_PATH + '/2_5458751034891467046.mp4', title: 'Video 10' },
-  { file: VIDEOS_PATH + '/2_5458751034891467056.mp4', title: 'Video 11' },
-  { file: VIDEOS_PATH + '/2_5462948497839910298.mp4', title: 'Video 12' },
+  { file: VIDEOS_PATH + '/2_5211184992486459614.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5211184992486459614.webm', title: 'Video 1' },
+  { file: VIDEOS_PATH + '/2_5235775282278869717.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5235775282278869717.webm', title: 'Video 2' },
+  { file: VIDEOS_PATH + '/2_5237973231792597901.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5237973231792597901.webm', title: 'Video 3' },
+  { file: VIDEOS_PATH + '/2_5282749129141818157.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5282749129141818157.webm', title: 'Video 4' },
+  { file: VIDEOS_PATH + '/2_5287781263149656497.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5287781263149656497.webm', title: 'Video 5' },
+  { file: VIDEOS_PATH + '/2_5373350012551988338.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5373350012551988338.webm', title: 'Video 6' },
+  { file: VIDEOS_PATH + '/2_5447322629427989855.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5447322629427989855.webm', title: 'Video 7' },
+  { file: VIDEOS_PATH + '/2_5452074624193953955.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5452074624193953955.webm', title: 'Video 8' },
+  { file: VIDEOS_PATH + '/2_5458622658318987050.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5458622658318987050.webm', title: 'Video 9' },
+  { file: VIDEOS_PATH + '/2_5458751034891467046.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5458751034891467046.webm', title: 'Video 10' },
+  { file: VIDEOS_PATH + '/2_5458751034891467056.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5458751034891467056.webm', title: 'Video 11' },
+  { file: VIDEOS_PATH + '/2_5462948497839910298.mp4', fileWebM: VIDEOS_WEBM_PATH + '/2_5462948497839910298.webm', title: 'Video 12' },
 ];
 
 // Debug: show video URLs on page
@@ -339,9 +343,11 @@ async function playVideo(index) {
   const v = videos[index];
   if (!v) return;
 
-  debug('Loading: ' + v.file);
+  // Use WebM for Firefox, MP4 for others
+  const url = isFirefox && v.fileWebM ? v.fileWebM : v.file;
+  debug('Loading: ' + url + ' (browser: ' + (isFirefox ? 'firefox' : 'other') + ')');
   setState(STATE.LOADING);
-  el.video.src = v.file;
+  el.video.src = url;
   el.video.load();
 
   el.title.textContent = v.title || 'Video ' + (index + 1);
@@ -394,7 +400,27 @@ el.video.addEventListener('pause', () => setState(STATE.PAUSED));
 el.video.addEventListener('error', () => {
   const err = el.video.error;
   debug('video error: code=' + err?.code + ' message=' + (err?.message || ''));
+  // Firefox often fails with MEDIA_ERR_DECODE (code=3) due to missing h264 codec
+  // Fall back to WebM if available
+  if (err?.code === 3 && isFirefox) {
+    const v = videos[currentIndex];
+    if (v && v.fileWebM && el.video.src !== v.fileWebM) {
+      debug('Retrying with WebM...');
+      setState(STATE.LOADING);
+      el.video.src = v.fileWebM;
+      el.video.load();
+      return;
+    }
+  }
   setState(STATE.ERROR);
+  // Show Firefox-specific message
+  if (err?.code === 3 && isFirefox) {
+    el.error.innerHTML = '<span>⚠ Bu brauzer video kodekni qo\'llab-quvvatlamaydi</span><small style="color:rgba(255,255,255,0.3);font-size:11px;text-align:center;display:block;padding:0 20px">Chrome yoki Edge bilan oching, yoki video faylni yuklab oling</small><button class="playme-error-retry" id="playmeRetryBtn">Qayta urinish</button>';
+    // Re-bind retry button
+    document.getElementById('playmeRetryBtn')?.addEventListener('click', () => {
+      if (videos[currentIndex]) playVideo(currentIndex);
+    });
+  }
 });
 
 el.video.addEventListener('timeupdate', () => {
@@ -806,6 +832,7 @@ el.retryBtn.addEventListener('click', () => {
 function loadDefaultVideos() {
   videos = DEFAULT_VIDEOS.map((v, i) => ({
     file: v.file,
+    fileWebM: v.fileWebM,
     name: 'video_' + (i + 1) + '.mp4',
     title: v.title,
     fromUser: false,
